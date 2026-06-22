@@ -9,4 +9,4 @@
 //    Supabase Dashboard → Project Settings → API → Project API keys → anon public
 // ------------------------------------------------------------
 window.SUPABASE_URL = "https://ijodwhogkafoeofacslq.supabase.co";
-window.SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
+window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlqb2R3aG9na2Fmb2VvZmFjc2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNTgxMjMsImV4cCI6MjA5MjgzNDEyM30.kvfP8O-sRlJUXeFN4wUVOxLduhhAfZ36xQjQL8JsAWg";
