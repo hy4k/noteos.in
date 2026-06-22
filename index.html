@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
@@ -128,6 +130,13 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   box-shadow: 0 0 10px rgba(245,197,24,.5);
   flex: none;
 }
+#signout {
+  background: transparent; border: 1px solid rgba(244,241,234,.18);
+  color: #8E8A82; width: 30px; height: 30px; border-radius: 50%;
+  cursor: pointer; font-size: 14px; line-height: 1; flex: none;
+  transition: all .18s; display: none;
+}
+#signout:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── Main scrollable area ── */
 #main {
@@ -203,6 +212,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
 .btn.primary { border-color: var(--accent); color: var(--accent); }
 .btn.primary:hover { background: var(--accent); color: #0B0B0C; }
+.btn:disabled { opacity: .4; cursor: default; }
 
 .chip {
   font-family: 'JetBrains Mono', monospace;
@@ -259,8 +269,33 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
 
 .venture-row { transition: background .18s; }
 .venture-row:hover { background: rgba(244,241,234,.02); }
-.vault-card { transition: background .18s; }
-.vault-card:hover { background: #0E0E10; }
+
+/* ── Auth overlay ── */
+#auth-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: #0B0B0C;
+  display: none; align-items: center; justify-content: center;
+  font-family: 'Hanken Grotesk', sans-serif;
+}
+#auth-overlay.show { display: flex; }
+.auth-card { width: 360px; max-width: 88vw; text-align: center; }
+.auth-brand {
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 40px;
+  letter-spacing: 4px; color: #F4F1EA; text-transform: uppercase;
+}
+.auth-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #6A675F; margin-top: 8px; }
+.auth-card input {
+  width: 100%; margin-top: 14px; padding: 14px 16px;
+  background: #0E0E10; border: 1px solid rgba(244,241,234,.14);
+  color: #F4F1EA; font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  outline: none;
+}
+.auth-card input:focus { border-color: var(--accent); }
+.auth-actions { display: flex; gap: 10px; margin-top: 16px; }
+.auth-actions .btn { flex: 1; }
+#auth-msg { margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; color: #8E8A82; min-height: 18px; }
+#auth-msg.err { color: #E8705B; }
+#auth-msg.ok { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -278,6 +313,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     <div id="rail-title">Threshold</div>
     <div id="rail-divider"></div>
     <div id="rail-nav"></div>
+    <button id="signout" title="Sign out">⎋</button>
     <div id="rail-pip"></div>
   </nav>
 
@@ -321,7 +357,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
           <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Focus</div><div id="pulse-focus" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0h</div></div>
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Done</div><div id="pulse-done" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0</div></div>
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Streak</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">12d</div></div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Top streak</div><div id="pulse-streak" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0d</div></div>
           </div>
         </div>
       </div>
@@ -419,7 +455,12 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
         <div><div class="sec-label">05 · Tasks</div><h2 class="sec-title">Tasks</h2></div>
         <div class="sec-desc">Open loops.<br>Close them.</div>
       </div>
-      <div style="margin-top:30px;max-width:760px" id="tasks-list"></div>
+      <div style="margin-top:30px;max-width:760px;display:flex;gap:10px">
+        <input id="task-input" placeholder="Add a task…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;font-size:14px;padding:13px 16px;outline:none">
+        <button id="task-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="tasks-list"></div>
       <div id="tasks-summary" class="mono-cap" style="margin-top:28px;font-size:11px;"></div>
     </section>
 
@@ -512,6 +553,21 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   </main>
 </div>
 
+<!-- Auth overlay -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-brand">Threshold</div>
+    <div class="auth-sub">Your command suite</div>
+    <input id="auth-email" type="email" placeholder="email" autocomplete="email">
+    <input id="auth-pass" type="password" placeholder="password" autocomplete="current-password">
+    <div class="auth-actions">
+      <button id="auth-signin" class="btn primary">Sign in</button>
+      <button id="auth-signup" class="btn">Create account</button>
+    </div>
+    <div id="auth-msg"></div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
@@ -522,21 +578,22 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   var FLEX_SECTIONS = { TODAY: 1 };
   var NAME = 'MITHUN';
 
-  // ── tiny persistence helpers ──
-  function todayKey() { return new Date().toISOString().slice(0, 10); }
-  function load(key, fallback) {
-    try { var v = localStorage.getItem('threshold:' + key); return v == null ? fallback : JSON.parse(v); }
-    catch (e) { return fallback; }
-  }
-  function save(key, val) {
-    try { localStorage.setItem('threshold:' + key, JSON.stringify(val)); } catch (e) {}
-  }
   function el(tag, attrs, html) {
     var n = document.createElement(tag);
     if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
     if (html != null) n.innerHTML = html;
     return n;
   }
+  function iso(d) { return d.toISOString().slice(0, 10); }
+  function todayStr() { return iso(new Date()); }
+
+  // ── Supabase client ──
+  var URL = window.SUPABASE_URL || '';
+  var KEY = window.SUPABASE_ANON_KEY || '';
+  var configured = KEY && KEY.indexOf('PASTE_') === -1 && !!window.supabase;
+  var sb = configured ? window.supabase.createClient(URL, KEY) : null;
+  var user = null;
+  var inited = false;
 
   // ════════════════════ NAV ════════════════════
   var current = 'TODAY';
@@ -552,7 +609,6 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     var s = document.getElementById('sec-' + name);
     if (s && name !== 'TODAY') s.style.display = 'none';
   });
-
   function goTo(name) {
     if (name === current) return;
     document.querySelectorAll('.nav-item').forEach(function (n) {
@@ -590,65 +646,8 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   tick();
   setInterval(tick, 30000);
 
-  // ════════════════════ FOCUS TIMER ════════════════════
-  (function () {
-    var presetMin = 50, remaining = presetMin * 60, running = false, timer = null;
-    var fkey = 'focus:' + todayKey();
-    var stats = load(fkey, { sessions: 0, seconds: 0 });
-
-    var clock = document.getElementById('focus-clock');
-    var toggle = document.getElementById('focus-toggle');
-    var resetBtn = document.getElementById('focus-reset');
-    var chips = document.querySelectorAll('#sec-FOCUS .chip');
-
-    function fmt(s) {
-      var m = Math.floor(s / 60), ss = s % 60;
-      return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss;
-    }
-    function fmtTotal(sec) {
-      var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
-      return h + 'h ' + (m < 10 ? '0' : '') + m + 'm';
-    }
-    function renderStats() {
-      document.getElementById('focus-sessions').textContent = stats.sessions;
-      document.getElementById('focus-total').textContent = fmtTotal(stats.seconds);
-      // mirror into TODAY pulse
-      var pf = document.getElementById('pulse-focus');
-      if (pf) pf.textContent = (stats.seconds / 3600).toFixed(1) + 'h';
-    }
-    function renderClock() { clock.textContent = fmt(remaining); }
-
-    function stop() { running = false; clearInterval(timer); timer = null; toggle.textContent = 'Start'; toggle.classList.add('primary'); }
-    function start() {
-      running = true; toggle.textContent = 'Pause'; toggle.classList.remove('primary');
-      timer = setInterval(function () {
-        remaining--;
-        if (remaining <= 0) {
-          stats.sessions += 1; stats.seconds += presetMin * 60; save(fkey, stats); renderStats();
-          remaining = presetMin * 60; stop(); renderClock();
-          return;
-        }
-        // accrue focus time live
-        stats.seconds += 1; if (remaining % 30 === 0) save(fkey, stats);
-        renderStats(); renderClock();
-      }, 1000);
-    }
-    toggle.addEventListener('click', function () { running ? stop() : start(); });
-    resetBtn.addEventListener('click', function () { stop(); remaining = presetMin * 60; renderClock(); });
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        if (running) return;
-        chips.forEach(function (x) { x.classList.remove('active'); });
-        c.classList.add('active');
-        presetMin = parseInt(c.dataset.min, 10);
-        remaining = presetMin * 60; renderClock();
-      });
-    });
-    renderClock(); renderStats();
-  })();
-
-  // ════════════════════ PROJECTS ════════════════════
-  (function () {
+  // ════════════════════ STATIC SHOWCASE SECTIONS ════════════════════
+  (function renderProjects() {
     var statusColor = { BUILDING: 'var(--accent)', ACTIVE: '#C9C5BC', STEADY: '#8E8A82', PAUSED: '#5A5752' };
     var rows = [
       { idx: 'P-01', name: 'NoteOS', desc: 'Personal command suite — the thing you are looking at.', status: 'BUILDING', metric: 'main · 71% to v2' },
@@ -669,138 +668,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     });
   })();
 
-  // ════════════════════ TASKS (persisted) ════════════════════
-  (function () {
-    var defs = [
-      { id: 't1', p: 'P1', label: 'Ship the FOCUS timer — NoteOS' },
-      { id: 't2', p: 'P1', label: 'Evaluate FETS aptitude papers (24)' },
-      { id: 't3', p: 'P2', label: 'Reply to two client emails' },
-      { id: 't4', p: 'P2', label: 'Push FETS portal exam module to review' },
-      { id: 't5', p: 'P3', label: 'Draft Salt & Static #58' },
-      { id: 't6', p: 'P3', label: 'Renew noteos.in domain' }
-    ];
-    var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
-    var state = load('tasks', { t6: true });
-    var listEl = document.getElementById('tasks-list');
-    var sumEl = document.getElementById('tasks-summary');
-    var loopsEl = document.getElementById('today-loops');
-
-    function render() {
-      listEl.innerHTML = ''; loopsEl.innerHTML = '';
-      var doneCount = 0;
-      defs.forEach(function (t) {
-        var done = !!state[t.id]; if (done) doneCount++;
-        var row = el('div', { class: 'task-row' + (done ? ' done' : ''), style: 'display:grid;grid-template-columns:18px 44px 1fr;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
-        row.innerHTML =
-          '<div class="check"></div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;letter-spacing:1px;color:' + pColor[t.p] + '">' + t.p + '</div>' +
-          '<div class="task-label" style="font-size:17px;color:#C9C5BC">' + t.label + '</div>';
-        row.addEventListener('click', function () {
-          state[t.id] = !state[t.id]; save('tasks', state); render();
-        });
-        listEl.appendChild(row);
-      });
-      sumEl.textContent = doneCount + ' of ' + defs.length + ' closed today';
-
-      // TODAY open-loops mirror: first 4 undone (then filler done ones)
-      var open = defs.filter(function (t) { return !state[t.id]; }).slice(0, 4);
-      if (open.length < 4) open = open.concat(defs.filter(function (t) { return state[t.id]; }).slice(0, 4 - open.length));
-      open.forEach(function (t) {
-        var done = !!state[t.id];
-        var d = el('div', { style: 'display:flex;gap:13px;align-items:center' });
-        d.innerHTML =
-          '<div style="width:13px;height:13px;flex:none;border:1.5px solid ' + (done ? 'var(--accent)' : 'rgba(244,241,234,.28)') + ';background:' + (done ? 'var(--accent)' : 'transparent') + '"></div>' +
-          '<div style="font-size:14px;color:' + (done ? '#5A5752' : '#C9C5BC') + ';text-decoration:' + (done ? 'line-through' : 'none') + '">' + t.label + '</div>';
-        loopsEl.appendChild(d);
-      });
-      var pd = document.getElementById('pulse-done'); if (pd) pd.textContent = doneCount;
-    }
-    render();
-  })();
-
-  // ════════════════════ HABITS (persisted) ════════════════════
-  (function () {
-    var defs = [
-      { id: 'h1', name: 'Deep Work', base: 12 },
-      { id: 'h2', name: 'Morning Walk', base: 31 },
-      { id: 'h3', name: 'Read 30 min', base: 9 },
-      { id: 'h4', name: 'Daily Commit', base: 18 },
-      { id: 'h5', name: 'No Screens After 10', base: 4 }
-    ];
-    var state = load('habits', {}); // { h1: { last: 'YYYY-MM-DD', streak: n } }
-    var listEl = document.getElementById('habits-list');
-
-    function streakOf(t) {
-      var s = state[t.id];
-      return s && typeof s.streak === 'number' ? s.streak : t.base;
-    }
-    function doneToday(t) {
-      var s = state[t.id];
-      return s && s.last === todayKey();
-    }
-    function render() {
-      listEl.innerHTML = '';
-      defs.forEach(function (t) {
-        var done = doneToday(t);
-        var row = el('div', { style: 'display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
-        var left = el('div', { style: 'display:flex;align-items:center;gap:18px' });
-        var pip = el('div', { class: 'habit-pip' + (done ? ' done' : '') });
-        var label = el('div', null,
-          '<div style="font-family:\'Oswald\',sans-serif;font-weight:500;font-size:21px;text-transform:uppercase;letter-spacing:.4px;color:#E6E2DA">' + t.name + '</div>');
-        left.appendChild(pip); left.appendChild(label);
-        var streak = el('div', { style: 'font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--accent)' },
-          streakOf(t) + ' day streak');
-        row.appendChild(left); row.appendChild(streak);
-
-        pip.addEventListener('click', function () {
-          var cur = streakOf(t);
-          if (doneToday(t)) { state[t.id] = { last: '', streak: Math.max(0, cur - 1) }; }
-          else { state[t.id] = { last: todayKey(), streak: cur + 1 }; }
-          save('habits', state); render();
-        });
-        listEl.appendChild(row);
-      });
-    }
-    render();
-  })();
-
-  // ════════════════════ HEALTH (persisted) ════════════════════
-  (function () {
-    var wkey = 'water:' + todayKey();
-    var glasses = load(wkey, 0);
-    var pipsEl = document.getElementById('water-pips');
-    var countEl = document.getElementById('water-count');
-
-    function renderWater() {
-      pipsEl.innerHTML = '';
-      for (var i = 0; i < 8; i++) {
-        pipsEl.appendChild(el('div', { class: 'water-pip' + (i < glasses ? ' full' : '') }));
-      }
-      countEl.textContent = glasses + ' / 8';
-    }
-    document.getElementById('water-plus').addEventListener('click', function () {
-      if (glasses < 8) { glasses++; save(wkey, glasses); renderWater(); }
-    });
-    document.getElementById('water-minus').addEventListener('click', function () {
-      if (glasses > 0) { glasses--; save(wkey, glasses); renderWater(); }
-    });
-    renderWater();
-
-    var owkey = 'workout:' + todayKey();
-    var wDone = load(owkey, false);
-    var wpip = document.getElementById('workout-pip');
-    var wlabel = document.getElementById('workout-label');
-    function renderWorkout() {
-      wpip.classList.toggle('done', wDone);
-      wlabel.textContent = wDone ? 'Done — nice.' : 'Not done yet';
-      wlabel.style.color = wDone ? 'var(--accent)' : '#C9C5BC';
-    }
-    wpip.addEventListener('click', function () { wDone = !wDone; save(owkey, wDone); renderWorkout(); });
-    renderWorkout();
-  })();
-
-  // ════════════════════ LEARN ════════════════════
-  (function () {
+  (function renderLearn() {
     var items = [
       { when: 'In progress', title: 'System Design — ByteByteGo', pct: 62 },
       { when: 'For FETS', title: 'Building automated test banks', pct: 80 },
@@ -823,8 +691,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     });
   })();
 
-  // ════════════════════ FINANCE ════════════════════
-  (function () {
+  (function renderFinance() {
     var entries = [
       { d: '21 JUN', label: 'FETS — June batch fees', amt: '+ ₹ 96,000', up: true },
       { d: '20 JUN', label: 'Studio Tideline — retainer', amt: '+ ₹ 60,000', up: true },
@@ -843,8 +710,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     });
   })();
 
-  // ════════════════════ JOURNAL ════════════════════
-  (function () {
+  (function renderJournal() {
     var items = [
       { d: '21 JUN 2026', t: 'The rail finally clicks', body: 'Rotated the navigation onto its side. Suddenly the whole thing reads like an instrument instead of a webpage.' },
       { d: '20 JUN 2026', t: 'FETS exams to review', body: 'Pushed the exam module of the FETS portal for review. The evaluation backlog is the real bottleneck now — automate it next.' },
@@ -860,6 +726,287 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
       c.appendChild(r);
     });
   })();
+
+  // ════════════════════ DATA LAYER (Supabase) ════════════════════
+  var TASK_SEED = [
+    { label: 'Ship the FOCUS timer — NoteOS', priority: 'P1', position: 0 },
+    { label: 'Evaluate FETS aptitude papers (24)', priority: 'P1', position: 1 },
+    { label: 'Reply to two client emails', priority: 'P2', position: 2 },
+    { label: 'Push FETS portal exam module to review', priority: 'P2', position: 3 },
+    { label: 'Draft Salt & Static #58', priority: 'P3', position: 4 },
+    { label: 'Renew noteos.in domain', priority: 'P3', position: 5 }
+  ];
+  var HABIT_SEED = ['Deep Work', 'Morning Walk', 'Read 30 min', 'Daily Commit', 'No Screens After 10'];
+  var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
+
+  // ---- TASKS ----
+  var tasksCache = [];
+  async function initTasks() {
+    var res = await sb.from('tasks').select('*').order('position', { ascending: true });
+    var tasks = res.data || [];
+    if (tasks.length === 0) {
+      await sb.from('tasks').insert(TASK_SEED.map(function (t) {
+        return { user_id: user.id, label: t.label, priority: t.priority, position: t.position };
+      }));
+      res = await sb.from('tasks').select('*').order('position', { ascending: true });
+      tasks = res.data || [];
+    }
+    tasksCache = tasks;
+    renderTasks();
+  }
+  function renderTasks() {
+    var listEl = document.getElementById('tasks-list');
+    var sumEl = document.getElementById('tasks-summary');
+    var loopsEl = document.getElementById('today-loops');
+    listEl.innerHTML = ''; loopsEl.innerHTML = '';
+    var doneCount = 0;
+    tasksCache.forEach(function (t) {
+      if (t.done) doneCount++;
+      var row = el('div', { class: 'task-row' + (t.done ? ' done' : ''), style: 'display:grid;grid-template-columns:18px 44px 1fr;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      row.innerHTML =
+        '<div class="check"></div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;letter-spacing:1px;color:' + (pColor[t.priority] || '#8E8A82') + '">' + t.priority + '</div>' +
+        '<div class="task-label" style="font-size:17px;color:#C9C5BC"></div>';
+      row.querySelector('.task-label').textContent = t.label;
+      row.addEventListener('click', function () { toggleTask(t); });
+      listEl.appendChild(row);
+    });
+    sumEl.textContent = doneCount + ' of ' + tasksCache.length + ' closed today';
+
+    var open = tasksCache.filter(function (t) { return !t.done; }).slice(0, 4);
+    if (open.length < 4) open = open.concat(tasksCache.filter(function (t) { return t.done; }).slice(0, 4 - open.length));
+    open.forEach(function (t) {
+      var d = el('div', { style: 'display:flex;gap:13px;align-items:center' });
+      d.innerHTML =
+        '<div style="width:13px;height:13px;flex:none;border:1.5px solid ' + (t.done ? 'var(--accent)' : 'rgba(244,241,234,.28)') + ';background:' + (t.done ? 'var(--accent)' : 'transparent') + '"></div>' +
+        '<div class="lbl" style="font-size:14px;color:' + (t.done ? '#5A5752' : '#C9C5BC') + ';text-decoration:' + (t.done ? 'line-through' : 'none') + '"></div>';
+      d.querySelector('.lbl').textContent = t.label;
+      loopsEl.appendChild(d);
+    });
+    var pd = document.getElementById('pulse-done'); if (pd) pd.textContent = doneCount;
+  }
+  async function toggleTask(t) {
+    t.done = !t.done; renderTasks();
+    await sb.from('tasks').update({ done: t.done }).eq('id', t.id);
+  }
+  async function addTask(label) {
+    var pos = tasksCache.length ? Math.max.apply(null, tasksCache.map(function (t) { return t.position; })) + 1 : 0;
+    var res = await sb.from('tasks').insert({ user_id: user.id, label: label, priority: 'P2', position: pos }).select().single();
+    if (res.data) { tasksCache.push(res.data); renderTasks(); }
+  }
+  document.getElementById('task-add').addEventListener('click', function () {
+    var inp = document.getElementById('task-input');
+    var v = inp.value.trim(); if (v && sb) { addTask(v); inp.value = ''; }
+  });
+  document.getElementById('task-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('task-add').click();
+  });
+
+  // ---- HABITS ----
+  var habitsCache = [];
+  var logsByHabit = {}; // habitId -> Set of date strings
+  async function initHabits() {
+    var res = await sb.from('habits').select('*').order('position', { ascending: true });
+    var habits = res.data || [];
+    if (habits.length === 0) {
+      await sb.from('habits').insert(HABIT_SEED.map(function (name, i) {
+        return { user_id: user.id, name: name, position: i };
+      }));
+      res = await sb.from('habits').select('*').order('position', { ascending: true });
+      habits = res.data || [];
+    }
+    habitsCache = habits;
+    var logs = (await sb.from('habit_logs').select('habit_id, log_date')).data || [];
+    logsByHabit = {};
+    logs.forEach(function (l) {
+      (logsByHabit[l.habit_id] = logsByHabit[l.habit_id] || new Set()).add(l.log_date);
+    });
+    renderHabits();
+  }
+  function streakOf(habitId) {
+    var set = logsByHabit[habitId] || new Set();
+    var d = new Date();
+    if (!set.has(iso(d))) d.setDate(d.getDate() - 1);
+    var s = 0;
+    while (set.has(iso(d))) { s++; d.setDate(d.getDate() - 1); }
+    return s;
+  }
+  function renderHabits() {
+    var listEl = document.getElementById('habits-list');
+    listEl.innerHTML = '';
+    var top = 0;
+    habitsCache.forEach(function (t) {
+      var set = logsByHabit[t.id] || new Set();
+      var done = set.has(todayStr());
+      var streak = streakOf(t.id);
+      if (streak > top) top = streak;
+      var row = el('div', { style: 'display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      var left = el('div', { style: 'display:flex;align-items:center;gap:18px' });
+      var pip = el('div', { class: 'habit-pip' + (done ? ' done' : '') });
+      var label = el('div', null, '<div style="font-family:\'Oswald\',sans-serif;font-weight:500;font-size:21px;text-transform:uppercase;letter-spacing:.4px;color:#E6E2DA"></div>');
+      label.querySelector('div').textContent = t.name;
+      left.appendChild(pip); left.appendChild(label);
+      var streakEl = el('div', { style: 'font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--accent)' }, streak + ' day streak');
+      row.appendChild(left); row.appendChild(streakEl);
+      pip.addEventListener('click', function () { toggleHabit(t); });
+      listEl.appendChild(row);
+    });
+    var ps = document.getElementById('pulse-streak'); if (ps) ps.textContent = top + 'd';
+  }
+  async function toggleHabit(t) {
+    var set = logsByHabit[t.id] = logsByHabit[t.id] || new Set();
+    var today = todayStr();
+    if (set.has(today)) {
+      set.delete(today); renderHabits();
+      await sb.from('habit_logs').delete().eq('habit_id', t.id).eq('log_date', today);
+    } else {
+      set.add(today); renderHabits();
+      await sb.from('habit_logs').insert({ user_id: user.id, habit_id: t.id, log_date: today });
+    }
+  }
+
+  // ---- FOCUS ----
+  (function () {
+    var presetMin = 50, remaining = presetMin * 60, running = false, timer = null;
+    var clock = document.getElementById('focus-clock');
+    var toggle = document.getElementById('focus-toggle');
+    var resetBtn = document.getElementById('focus-reset');
+    var chips = document.querySelectorAll('#sec-FOCUS .chip');
+
+    function fmt(s) { var m = Math.floor(s / 60), ss = s % 60; return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss; }
+    function fmtTotal(min) { var h = Math.floor(min / 60), m = min % 60; return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
+    function renderClock() { clock.textContent = fmt(remaining); }
+    function stop() { running = false; clearInterval(timer); timer = null; toggle.textContent = 'Start'; toggle.classList.add('primary'); }
+    function start() {
+      running = true; toggle.textContent = 'Pause'; toggle.classList.remove('primary');
+      timer = setInterval(function () {
+        remaining--;
+        if (remaining <= 0) { stop(); logSession(presetMin); remaining = presetMin * 60; renderClock(); return; }
+        renderClock();
+      }, 1000);
+    }
+    toggle.addEventListener('click', function () { running ? stop() : start(); });
+    resetBtn.addEventListener('click', function () { stop(); remaining = presetMin * 60; renderClock(); });
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        if (running) return;
+        chips.forEach(function (x) { x.classList.remove('active'); });
+        c.classList.add('active');
+        presetMin = parseInt(c.dataset.min, 10);
+        remaining = presetMin * 60; renderClock();
+      });
+    });
+    renderClock();
+
+    async function logSession(min) {
+      if (!sb || !user) return;
+      var label = document.getElementById('focus-task').value.trim() || null;
+      await sb.from('focus_sessions').insert({ user_id: user.id, task_label: label, minutes: min });
+      refreshFocus();
+    }
+    window.__refreshFocus = async function () {
+      if (!sb || !user) return;
+      var start = todayStr() + 'T00:00:00';
+      var res = await sb.from('focus_sessions').select('minutes').gte('completed_at', start);
+      var rows = res.data || [];
+      var total = rows.reduce(function (a, b) { return a + b.minutes; }, 0);
+      document.getElementById('focus-sessions').textContent = rows.length;
+      document.getElementById('focus-total').textContent = fmtTotal(total);
+      var pf = document.getElementById('pulse-focus'); if (pf) pf.textContent = (total / 60).toFixed(1) + 'h';
+    };
+    function refreshFocus() { window.__refreshFocus(); }
+  })();
+
+  // ---- HEALTH ----
+  var health = { water: 0, workout: false };
+  async function initHealth() {
+    var res = await sb.from('health_logs').select('*').eq('log_date', todayStr()).maybeSingle();
+    if (res.data) { health.water = res.data.water_glasses; health.workout = res.data.workout_done; }
+    else { health.water = 0; health.workout = false; }
+    renderHealth();
+  }
+  function renderHealth() {
+    var pipsEl = document.getElementById('water-pips');
+    pipsEl.innerHTML = '';
+    for (var i = 0; i < 8; i++) pipsEl.appendChild(el('div', { class: 'water-pip' + (i < health.water ? ' full' : '') }));
+    document.getElementById('water-count').textContent = health.water + ' / 8';
+    var wpip = document.getElementById('workout-pip');
+    var wlabel = document.getElementById('workout-label');
+    wpip.classList.toggle('done', health.workout);
+    wlabel.textContent = health.workout ? 'Done — nice.' : 'Not done yet';
+    wlabel.style.color = health.workout ? 'var(--accent)' : '#C9C5BC';
+  }
+  async function saveHealth() {
+    await sb.from('health_logs').upsert(
+      { user_id: user.id, log_date: todayStr(), water_glasses: health.water, workout_done: health.workout, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,log_date' }
+    );
+  }
+  document.getElementById('water-plus').addEventListener('click', function () { if (sb && health.water < 8) { health.water++; renderHealth(); saveHealth(); } });
+  document.getElementById('water-minus').addEventListener('click', function () { if (sb && health.water > 0) { health.water--; renderHealth(); saveHealth(); } });
+  document.getElementById('workout-pip').addEventListener('click', function () { if (sb) { health.workout = !health.workout; renderHealth(); saveHealth(); } });
+
+  async function initData() {
+    if (inited) return; inited = true;
+    var u = await sb.auth.getUser();
+    user = u.data.user;
+    document.getElementById('signout').style.display = 'block';
+    try {
+      await initTasks();
+      await initHabits();
+      await window.__refreshFocus();
+      await initHealth();
+    } catch (e) { console.error('initData', e); }
+  }
+
+  // ════════════════════ AUTH ════════════════════
+  var overlay = document.getElementById('auth-overlay');
+  var msg = document.getElementById('auth-msg');
+  function showMsg(t, cls) { msg.textContent = t; msg.className = cls || ''; }
+  function showOverlay() { overlay.classList.add('show'); }
+  function hideOverlay() { overlay.classList.remove('show'); }
+
+  document.getElementById('auth-signin').addEventListener('click', async function () {
+    var email = document.getElementById('auth-email').value.trim();
+    var pass = document.getElementById('auth-pass').value;
+    if (!email || !pass) return showMsg('Enter email and password.', 'err');
+    showMsg('Signing in…');
+    var res = await sb.auth.signInWithPassword({ email: email, password: pass });
+    if (res.error) showMsg(res.error.message, 'err');
+  });
+  document.getElementById('auth-signup').addEventListener('click', async function () {
+    var email = document.getElementById('auth-email').value.trim();
+    var pass = document.getElementById('auth-pass').value;
+    if (!email || !pass) return showMsg('Enter email and password.', 'err');
+    showMsg('Creating account…');
+    var res = await sb.auth.signUp({ email: email, password: pass });
+    if (res.error) showMsg(res.error.message, 'err');
+    else if (res.data.session) showMsg('Welcome.', 'ok');
+    else showMsg('Account created — check your email to confirm, then sign in.', 'ok');
+  });
+  document.getElementById('auth-email').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('auth-pass').focus(); });
+  document.getElementById('auth-pass').addEventListener('keydown', function (e) { if (e.key === 'Enter') document.getElementById('auth-signin').click(); });
+  document.getElementById('signout').addEventListener('click', async function () { await sb.auth.signOut(); location.reload(); });
+
+  // ════════════════════ BOOT ════════════════════
+  async function boot() {
+    if (!sb) {
+      showOverlay();
+      document.querySelector('.auth-actions').style.display = 'none';
+      document.getElementById('auth-email').style.display = 'none';
+      document.getElementById('auth-pass').style.display = 'none';
+      showMsg('Backend not configured yet. Add your Supabase anon key in supabase-config.js, then reload.', 'err');
+      return;
+    }
+    var s = await sb.auth.getSession();
+    if (s.data.session) { hideOverlay(); await initData(); }
+    else { showOverlay(); }
+    sb.auth.onAuthStateChange(function (evt, session) {
+      if (session) { hideOverlay(); initData(); }
+      else if (evt === 'SIGNED_OUT') { showOverlay(); }
+    });
+  }
+  boot();
 
 })();
 </script>
