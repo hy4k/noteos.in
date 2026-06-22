@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#0B0B0C;}
+:root{--accent:#F5C518;}
+::selection{background:#F5C518;color:#0B0B0C;}
+.scl::-webkit-scrollbar{width:9px;}
+.scl::-webkit-scrollbar-thumb{background:rgba(244,241,234,.12);}
+.scl::-webkit-scrollbar-track{background:transparent;}
+@keyframes fu{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="display:flex;height:100vh;width:100%;background:#0B0B0C;color:#F4F1EA;font-family:'Hanken Grotesk',sans-serif;overflow:hidden;position:relative">
+
+  <sc-if value="{{ showOrb }}" hint-placeholder-val="{{ true }}">
+  <div style="position:absolute;right:-190px;top:50%;transform:translateY(-50%);width:460px;height:460px;border-radius:50%;border:1px solid rgba(244,241,234,.055);pointer-events:none;z-index:0">
+    <div style="position:absolute;inset:0;transform:rotate({{ dayDeg }}deg)">
+      <div style="position:absolute;top:-5px;left:50%;width:9px;height:9px;border-radius:50%;background:var(--accent,#F5C518);transform:translateX(-50%);box-shadow:0 0 16px rgba(245,197,24,.55)"></div>
+    </div>
+    <div style="position:absolute;inset:78px;border-radius:50%;border:1px solid rgba(244,241,234,.04)"></div>
+  </div>
+  </sc-if>
+
+  <nav style="width:74px;flex:none;height:100%;border-right:1px solid rgba(244,241,234,.07);display:flex;flex-direction:column;align-items:center;padding:24px 0 22px;gap:20px;position:relative;z-index:5;background:#0B0B0C">
+    <div style="writing-mode:vertical-rl;transform:rotate(180deg);font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;letter-spacing:4px;color:#F4F1EA;text-transform:uppercase">THRESHOLD</div>
+    <div style="width:16px;height:1px;background:rgba(244,241,234,.16)"></div>
+    <div style="display:flex;flex-direction:column;gap:11px;align-items:center;flex:1">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="9">
+        <div onClick="{{ item.onClick }}" style="{{ item.style }}" style-hover="opacity:1">{{ item.label }}</div>
+      </sc-for>
+    </div>
+    <div style="width:7px;height:7px;border-radius:50%;background:var(--accent,#F5C518);box-shadow:0 0 10px rgba(245,197,24,.5)"></div>
+  </nav>
+
+  <main ref="{{ setC }}" class="scl" style="flex:1;height:100%;overflow-y:auto;position:relative;z-index:1">
+
+    <!-- ============ TODAY ============ -->
+    <sc-if value="{{ showToday }}" hint-placeholder-val="{{ true }}">
+    <section data-screen-label="TODAY" style="min-height:100%;display:flex;flex-direction:column;padding:56px 72px 64px 64px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;color:#6A675F;text-transform:uppercase">{{ dateLine }}</div>
+      <div style="margin-top:11px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;color:#6A675F;text-transform:uppercase">{{ location }}</div>
+
+      <div style="margin-top:118px">
+        <h1 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:104px;line-height:.9;letter-spacing:-1.5px;text-transform:uppercase;margin:0;color:#F4F1EA">{{ greeting }},<br><span style="color:var(--accent,#F5C518)">{{ name }}</span></h1>
+      </div>
+
+      <div style="margin-top:84px;max-width:600px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">Today's North Star</div>
+        <p style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400">Ship the LEDGER screen of NoteOS v2. Nothing else moves until it's done.</p>
+        <div style="margin-top:24px;width:100%;height:1px;background:rgba(244,241,234,.1)"></div>
+      </div>
+
+      <div style="margin-top:auto;padding-top:72px;display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:0;border-top:1px solid rgba(244,241,234,.09)">
+        <div style="padding:26px 36px 4px 0;border-right:1px solid rgba(244,241,234,.07)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Blocks</div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:13px">
+            <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="4">
+              <div style="display:flex;gap:16px;align-items:baseline">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent,#F5C518);min-width:46px">{{ b.t }}</div>
+                <div style="font-size:14px;color:#C9C5BC">{{ b.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:26px 36px 4px;border-right:1px solid rgba(244,241,234,.07)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Open Loops</div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:13px">
+            <sc-for list="{{ loops }}" as="l" hint-placeholder-count="4">
+              <div style="display:flex;gap:13px;align-items:center">
+                <div style="width:13px;height:13px;flex:none;border:1.5px solid {{ l.border }};background:{{ l.bg }}"></div>
+                <div style="font-size:14px;color:{{ l.color }};text-decoration:{{ l.deco }}">{{ l.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:26px 0 4px 36px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Pulse</div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
+            <sc-for list="{{ pulse }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">{{ p.k }}</div>
+                <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">{{ p.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ VENTURES ============ -->
+    <sc-if value="{{ showVentures }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="VENTURES" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">02 · Ventures</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Ventures</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">What I'm building<br>and what's gone quiet.</div>
+      </div>
+      <div style="margin-top:8px">
+        <sc-for list="{{ ventures }}" as="v" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)" style-hover="background:rgba(244,241,234,.02)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">{{ v.idx }}</div>
+            <div>
+              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">{{ v.name }}</div>
+              <div style="font-size:15px;color:#8E8A82;margin-top:5px">{{ v.desc }}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:{{ v.statusColor }}">{{ v.status }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:7px">{{ v.metric }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ VAULT ============ -->
+    <sc-if value="{{ showVault }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="VAULT" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">03 · Vault</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Vault</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">Fragments worth<br>keeping.</div>
+      </div>
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
+        <sc-for list="{{ vault }}" as="f" hint-placeholder-count="6">
+          <div style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between" style-hover="background:#0E0E10">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent,#F5C518)">{{ f.tag }}</div>
+            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px;text-wrap:pretty">{{ f.title }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">{{ f.src }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ LEDGER ============ -->
+    <sc-if value="{{ showLedger }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="LEDGER" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">04 · Ledger</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Ledger</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">Runway, not score.</div>
+      </div>
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:0">
+        <sc-for list="{{ ledgerStats }}" as="s" hint-placeholder-count="3">
+          <div style="padding:6px 32px 6px 0">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">{{ s.k }}</div>
+            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:{{ s.color }};margin-top:10px">{{ s.v }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:44px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Recent Movement</div>
+      <div style="margin-top:10px">
+        <sc-for list="{{ entries }}" as="e" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">{{ e.d }}</div>
+            <div style="font-size:15px;color:#C9C5BC">{{ e.label }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:{{ e.amtColor }}">{{ e.amt }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ ANCHOR ============ -->
+    <sc-if value="{{ showAnchor }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="ANCHOR" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">05 · Anchor</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Anchor</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">What holds steady<br>when everything moves.</div>
+      </div>
+      <div style="margin-top:38px;display:grid;grid-template-columns:1.3fr 1fr;gap:56px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:20px">Operating Principles</div>
+          <sc-for list="{{ principles }}" as="p" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
+              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent,#F5C518)">{{ p.n }}</div>
+              <div style="font-size:18px;line-height:1.4;color:#D4D0C8">{{ p.t }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:20px">Daily Anchors</div>
+          <div style="display:flex;flex-direction:column;gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
+            <sc-for list="{{ anchors }}" as="a" hint-placeholder-count="4">
+              <div style="background:#0B0B0C;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;text-transform:uppercase;letter-spacing:.5px;color:#E6E2DA">{{ a.h }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent,#F5C518)">{{ a.s }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ DAYBOOK ============ -->
+    <sc-if value="{{ showDaybook }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="DAYBOOK" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">06 · Daybook</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Daybook</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">A line a day,<br>most days.</div>
+      </div>
+      <div style="margin-top:20px;max-width:760px">
+        <sc-for list="{{ daybook }}" as="d" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:30px;padding:30px 0;border-bottom:1px solid rgba(244,241,234,.07)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent,#F5C518);padding-top:6px">{{ d.d }}</div>
+            <div>
+              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:25px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">{{ d.t }}</div>
+              <div style="font-size:16px;line-height:1.6;color:#9A968E;margin-top:9px;text-wrap:pretty">{{ d.body }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ HORIZON ============ -->
+    <sc-if value="{{ showHorizon }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="HORIZON" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">07 · Horizon</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Horizon</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">Where this is<br>all pointed.</div>
+      </div>
+      <div style="margin-top:30px">
+        <sc-for list="{{ goals }}" as="g" hint-placeholder-count="4">
+          <div style="padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
+              <div style="display:flex;align-items:baseline;gap:22px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">{{ g.when }}</div>
+                <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">{{ g.title }}</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent,#F5C518)">{{ g.pctLabel }}</div>
+            </div>
+            <div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)">
+              <div style="height:2px;width:{{ g.bar }};background:var(--accent,#F5C518)"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ ALMANAC ============ -->
+    <sc-if value="{{ showAlmanac }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="ALMANAC" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">08 · Almanac</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Almanac</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">Dates, cycles,<br>things not to forget.</div>
+      </div>
+      <div style="margin-top:38px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:14px">Upcoming</div>
+          <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent,#F5C518)">{{ u.d }}</div>
+              <div style="font-size:15px;color:#C9C5BC">{{ u.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:26px">
+          <div style="border:1px solid rgba(244,241,234,.09);padding:26px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">On This Day</div>
+            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:24px;line-height:1.2;color:#E6E2DA;margin-top:14px;text-wrap:pretty">{{ onThisDay }}</div>
+          </div>
+          <div style="border:1px solid rgba(244,241,234,.09);padding:26px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Moon</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#C9C5BC;margin-top:10px">{{ moon }}</div>
+            </div>
+            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(90deg,#1C1C1E 0 22%,#E6E2DA 22% 100%);border:1px solid rgba(244,241,234,.12)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ============ BRIEF ============ -->
+    <sc-if value="{{ showBrief }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="BRIEF" style="min-height:100%;padding:54px 72px 80px 64px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:24px;border-bottom:1px solid rgba(244,241,234,.09)">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">09 · Brief</div>
+          <h2 style="font-family:'Oswald',sans-serif;font-weight:700;font-size:62px;line-height:1;text-transform:uppercase;margin:14px 0 0;letter-spacing:-.5px;color:#F4F1EA">Brief</h2>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#6A675F;text-align:right;line-height:1.7">The day, compressed.</div>
+      </div>
+      <div style="margin-top:38px;display:grid;grid-template-columns:1.4fr 1fr;gap:56px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:8px">Signals</div>
+          <sc-for list="{{ signals }}" as="s" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(244,241,234,.07)">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent,#F5C518)">{{ s.n }}</div>
+              <div style="font-size:19px;line-height:1.45;color:#D4D0C8;text-wrap:pretty">{{ s.t }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:18px">Reading Queue</div>
+          <sc-for list="{{ reading }}" as="r" hint-placeholder-count="3">
+            <div style="padding:15px 0;border-bottom:1px solid rgba(244,241,234,.06)">
+              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;color:#E6E2DA">{{ r.t }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:5px">{{ r.s }}</div>
+            </div>
+          </sc-for>
+          <div style="margin-top:30px;border:1px solid rgba(244,241,234,.09);padding:24px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">Today reduces to</div>
+            <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;color:var(--accent,#F5C518);margin-top:8px;line-height:1">One ship.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#F5C518&quot;,&quot;options&quot;:[&quot;#F5C518&quot;,&quot;#E8593B&quot;,&quot;#5BD6B0&quot;,&quot;#7AA2F7&quot;,&quot;#F4F1EA&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;name&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;MITHUN&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;location&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;CALICUT — 28°C, HUMID&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showOrb&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { section: 'TODAY', now: new Date() };
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState({ now: new Date() }), 30000);
+    this._apply();
+  }
+  componentDidUpdate() { this._apply(); }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  _apply() {
+    const a = this.props.accent || '#F5C518';
+    if (this._root) this._root.style.setProperty('--accent', a);
+  }
+
+  setRoot = (el) => { this._root = el; };
+  setC = (el) => { this._c = el; };
+
+  go(id) {
+    if (id === this.state.section) return;
+    this.setState({ section: id }, () => {
+      if (this._c) {
+        this._c.scrollTop = 0;
+        this._c.animate(
+          [{ opacity: 0.35, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' }
+        );
+      }
+    });
+  }
+
+  renderVals() {
+    const now = this.state.now;
+    const section = this.state.section;
+    const accent = this.props.accent || '#F5C518';
+    const days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    const h = now.getHours();
+    const greeting = h < 12 ? 'GOOD MORNING' : h < 17 ? 'GOOD AFTERNOON' : h < 21 ? 'GOOD EVENING' : 'GOOD NIGHT';
+    const dateLine = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    const dayFrac = (h * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 86400;
+    const dayDeg = Math.round(dayFrac * 360);
+
+    const secs = [['01','TODAY'],['02','VENTURES'],['03','VAULT'],['04','LEDGER'],['05','ANCHOR'],['06','DAYBOOK'],['07','HORIZON'],['08','ALMANAC'],['09','BRIEF']];
+    const navItems = secs.map(([n, label]) => {
+      const active = label === section;
+      return {
+        label,
+        onClick: () => this.go(label),
+        style: `writing-mode:vertical-rl;transform:rotate(180deg);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:${active ? 'var(--accent,#F5C518)' : '#F4F1EA'};opacity:${active ? 1 : 0.4};font-weight:${active ? 500 : 400};transition:opacity .22s ease,color .22s ease;padding:3px 4px`
+      };
+    });
+
+    // TODAY modules
+    const blocks = [
+      { t: '08:00', label: 'Beach road + coffee' },
+      { t: '09:30', label: 'Deep work — LEDGER screen' },
+      { t: '13:00', label: 'Client call — Tideline' },
+      { t: '17:00', label: 'Walk, then daybook' },
+    ];
+    const loopsRaw = [
+      { label: 'Wire the LEDGER screen', done: false },
+      { label: 'Reply to two clients', done: false },
+      { label: 'Draft Salt & Static #58', done: false },
+      { label: 'Renew noteos.in domain', done: true },
+    ];
+    const loops = loopsRaw.map(l => ({
+      label: l.label,
+      color: l.done ? '#5A5752' : '#C9C5BC',
+      deco: l.done ? 'line-through' : 'none',
+      bg: l.done ? 'var(--accent,#F5C518)' : 'transparent',
+      border: l.done ? 'var(--accent,#F5C518)' : 'rgba(244,241,234,.28)',
+    }));
+    const pulse = [
+      { k: 'Focus', v: '3.5h' },
+      { k: 'Shipped', v: '2' },
+      { k: 'Streak', v: '12d' },
+    ];
+
+    // VENTURES
+    const statusColor = { BUILDING: 'var(--accent,#F5C518)', ACTIVE: '#C9C5BC', STEADY: '#8E8A82', DORMANT: '#5A5752' };
+    const venturesRaw = [
+      { idx: 'V-01', name: 'NoteOS', desc: 'Personal command suite. The thing you are looking at.', status: 'BUILDING', metric: 'v2 · 71% to launch' },
+      { idx: 'V-02', name: 'Studio Tideline', desc: 'Design + interface studio. Calicut.', status: 'ACTIVE', metric: '3 clients · 2 in pipeline' },
+      { idx: 'V-03', name: 'Salt & Static', desc: 'Weekly letter on tools, taste and the coast.', status: 'STEADY', metric: '1,420 readers' },
+      { idx: 'V-04', name: 'Archive 47', desc: 'A photo project. Shelved, not dead.', status: 'DORMANT', metric: 'last touched · Apr 2026' },
+    ];
+    const ventures = venturesRaw.map(v => ({ ...v, statusColor: statusColor[v.status] }));
+
+    // VAULT
+    const vault = [
+      { tag: 'PRINCIPLE', title: 'Make the boring parts beautiful.', src: 'note · 2024' },
+      { tag: 'SNIPPET', title: 'writing-mode: vertical-rl for rail labels', src: 'codepen' },
+      { tag: 'LINK', title: 'The Garden and the Stream', src: 'tomcritchlow.com' },
+      { tag: 'QUOTE', title: '"Tools amplify whatever you bring to them."', src: '—' },
+      { tag: 'IDEA', title: 'A daybook that drafts the weekly brief itself.', src: 'shower · today' },
+      { tag: 'REFERENCE', title: 'Grid Systems — Müller-Brockmann', src: 'the shelf' },
+    ];
+
+    // LEDGER
+    const ledgerStats = [
+      { k: 'Net Position', v: '₹ 18.4L', color: '#F4F1EA' },
+      { k: 'Runway', v: '14 mo', color: '#F4F1EA' },
+      { k: 'This Month', v: '+ ₹ 92.4K', color: 'var(--accent,#F5C518)' },
+    ];
+    const entriesRaw = [
+      { d: '21 JUN', label: 'Studio Tideline — retainer', amt: '+ ₹ 60,000', up: true },
+      { d: '19 JUN', label: 'AWS + Vercel', amt: '− ₹ 4,210', up: false },
+      { d: '18 JUN', label: 'Salt & Static — sponsor', amt: '+ ₹ 18,000', up: true },
+      { d: '15 JUN', label: 'Rent — Calicut', amt: '− ₹ 22,000', up: false },
+      { d: '12 JUN', label: 'Camera lens — Archive 47', amt: '− ₹ 31,500', up: false },
+    ];
+    const entries = entriesRaw.map(e => ({ ...e, amtColor: e.up ? 'var(--accent,#F5C518)' : '#8E8A82' }));
+
+    // ANCHOR
+    const principles = [
+      'Default to shipping. Taste is edited, not planned.',
+      'One north star a day. The rest is noise.',
+      'Protect the mornings. Make them sacred.',
+      'Money is runway, not a scoreboard.',
+      'Leave the coast better than you found it.',
+    ].map((t, i) => ({ n: String(i + 1).padStart(2, '0'), t }));
+    const anchors = [
+      { h: 'Deep Work', s: '12 day streak' },
+      { h: 'Walk · Beach Rd', s: '31 day streak' },
+      { h: 'No Screens After 10', s: '4 day streak' },
+      { h: 'Write 200 Words', s: '9 day streak' },
+    ];
+
+    // DAYBOOK
+    const daybook = [
+      { d: '21 JUN 2026', t: 'The rail finally clicks', body: 'Rotated the navigation onto its side. Suddenly the whole thing reads like an instrument instead of a webpage.' },
+      { d: '20 JUN 2026', t: 'A slow Friday', body: 'Walked the beach road twice and read instead of building. Needed it more than I admitted.' },
+      { d: '18 JUN 2026', t: 'First sponsor said yes', body: 'Salt & Static has its first real backer. Small money, but it changes how the whole thing feels.' },
+    ];
+
+    // HORIZON
+    const goalsRaw = [
+      { when: 'This Quarter', title: 'Launch NoteOS v2', pct: 71 },
+      { when: '2026', title: '2,500 readers on the letter', pct: 57 },
+      { when: '2026', title: 'Studio to ₹5L / mo recurring', pct: 38 },
+      { when: '3 Years', title: 'The house by the water', pct: 12 },
+    ];
+    const goals = goalsRaw.map(g => ({ ...g, bar: g.pct + '%', pctLabel: g.pct + '%' }));
+
+    // ALMANAC
+    const upcoming = [
+      { d: '24 JUN', label: 'Domain renewal · noteos.in' },
+      { d: '28 JUN', label: 'Amma — birthday' },
+      { d: '01 JUL', label: 'Quarterly review' },
+      { d: '08 JUL', label: 'Tideline shoot · Kappad beach' },
+    ];
+    const onThisDay = '21 June — the solstice. The longest light of the year. Build accordingly.';
+    const moon = 'WANING GIBBOUS · 78%';
+
+    // BRIEF
+    const signals = [
+      'NoteOS v2 is 71% done — the LEDGER screen is the last gate. Push it today.',
+      'Two client replies are pending. Send both before noon.',
+      "Issue #58 of the letter drafts itself from this week's daybook.",
+    ].map((t, i) => ({ n: String(i + 1).padStart(2, '0'), t }));
+    const reading = [
+      { t: 'The Garden and the Stream', s: 'Tom Critchlow' },
+      { t: 'Working in Public', s: 'Nadia Eghbal' },
+      { t: 'A Pattern Language', s: 'C. Alexander' },
+    ];
+
+    return {
+      setRoot: this.setRoot, setC: this.setC,
+      navItems, greeting, dateLine, dayDeg,
+      name: this.props.name || 'MITHUN',
+      location: this.props.location || 'CALICUT — 28°C, HUMID',
+      showOrb: this.props.showOrb !== false,
+      showToday: section === 'TODAY', showVentures: section === 'VENTURES', showVault: section === 'VAULT',
+      showLedger: section === 'LEDGER', showAnchor: section === 'ANCHOR', showDaybook: section === 'DAYBOOK',
+      showHorizon: section === 'HORIZON', showAlmanac: section === 'ALMANAC', showBrief: section === 'BRIEF',
+      blocks, loops, pulse, ventures, vault, ledgerStats, entries,
+      principles, anchors, daybook, goals, upcoming, onThisDay, moon, signals, reading,
+    };
+  }
+}
+</script>
+</body>
+</html>
