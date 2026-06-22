@@ -906,8 +906,8 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     }
     window.__refreshFocus = async function () {
       if (!sb || !user) return;
-      var start = todayStr() + 'T00:00:00';
-      var res = await sb.from('focus_sessions').select('minutes').gte('completed_at', start);
+      var d0 = new Date(); d0.setHours(0, 0, 0, 0); // local midnight
+      var res = await sb.from('focus_sessions').select('minutes').gte('completed_at', d0.toISOString());
       var rows = res.data || [];
       var total = rows.reduce(function (a, b) { return a + b.minutes; }, 0);
       document.getElementById('focus-sessions').textContent = rows.length;
@@ -1001,8 +1001,10 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
     var s = await sb.auth.getSession();
     if (s.data.session) { hideOverlay(); await initData(); }
     else { showOverlay(); }
+    // Note: supabase-js can deadlock if you await its calls *inside* this
+    // callback, so defer the data load out of the callback tick.
     sb.auth.onAuthStateChange(function (evt, session) {
-      if (session) { hideOverlay(); initData(); }
+      if (session) { hideOverlay(); setTimeout(initData, 0); }
       else if (evt === 'SIGNED_OUT') { showOverlay(); }
     });
   }
