@@ -65,8 +65,8 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0 22px;
-  gap: 20px;
+  padding: 22px 0 20px;
+  gap: 16px;
   position: relative;
   z-index: 5;
   background: #0B0B0C;
@@ -85,14 +85,19 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   width: 16px;
   height: 1px;
   background: rgba(244,241,234,.16);
+  flex: none;
 }
 #rail-nav {
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 9px;
   align-items: center;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+#rail-nav::-webkit-scrollbar { display: none; }
 .nav-item {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
@@ -107,6 +112,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   transition: opacity .22s ease, color .22s ease;
   padding: 3px 4px;
   user-select: none;
+  flex: none;
 }
 .nav-item:hover { opacity: 1; }
 .nav-item.active {
@@ -120,6 +126,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 10px rgba(245,197,24,.5);
+  flex: none;
 }
 
 /* ── Main scrollable area ── */
@@ -135,10 +142,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
 #main::-webkit-scrollbar-track { background: transparent; }
 
 /* ── Section base ── */
-.section {
-  display: none;
-  min-height: 100%;
-}
+.section { display: none; min-height: 100%; }
 .section.active { display: block; }
 
 /* ── Shared header rhythm ── */
@@ -175,6 +179,88 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   text-align: right;
   line-height: 1.7;
 }
+.mono-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #6A675F;
+}
+
+/* ── Interactive bits ── */
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #F4F1EA;
+  background: transparent;
+  border: 1px solid rgba(244,241,234,.18);
+  padding: 13px 26px;
+  cursor: pointer;
+  transition: border-color .18s, color .18s, background .18s;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { border-color: var(--accent); color: var(--accent); }
+.btn.primary:hover { background: var(--accent); color: #0B0B0C; }
+
+.chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #8E8A82;
+  background: transparent;
+  border: 1px solid rgba(244,241,234,.12);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all .18s;
+}
+.chip:hover { color: #F4F1EA; border-color: rgba(244,241,234,.3); }
+.chip.active { color: var(--accent); border-color: var(--accent); }
+
+.check {
+  width: 15px; height: 15px; flex: none;
+  border: 1.5px solid rgba(244,241,234,.28);
+  background: transparent;
+  cursor: pointer;
+  transition: all .15s;
+}
+.task-row { cursor: pointer; }
+.task-row:hover .check { border-color: var(--accent); }
+.task-row.done .check { background: var(--accent); border-color: var(--accent); }
+.task-row.done .task-label { color: #5A5752; text-decoration: line-through; }
+
+.habit-pip {
+  width: 26px; height: 26px; flex: none; border-radius: 50%;
+  border: 1.5px solid rgba(244,241,234,.22);
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.habit-pip:hover { border-color: var(--accent); }
+.habit-pip.done { background: var(--accent); border-color: var(--accent); }
+.habit-pip.done::after { content: '✓'; color: #0B0B0C; font-size: 13px; font-weight: 700; }
+
+.step-btn {
+  width: 34px; height: 34px; flex: none;
+  border: 1px solid rgba(244,241,234,.18);
+  background: transparent; color: #F4F1EA;
+  font-size: 18px; cursor: pointer; line-height: 1;
+  transition: all .15s;
+}
+.step-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.water-pip {
+  width: 22px; height: 30px; flex: none;
+  border: 1.5px solid rgba(244,241,234,.2);
+  border-radius: 0 0 6px 6px;
+  transition: all .2s;
+}
+.water-pip.full { background: var(--accent); border-color: var(--accent); }
+
+.venture-row { transition: background .18s; }
+.venture-row:hover { background: rgba(244,241,234,.02); }
+.vault-card { transition: background .18s; }
+.vault-card:hover { background: #0E0E10; }
 </style>
 </head>
 <body>
@@ -183,9 +269,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
 
   <!-- Orb -->
   <div id="orb">
-    <div id="orb-inner">
-      <div id="orb-dot"></div>
-    </div>
+    <div id="orb-inner"><div id="orb-dot"></div></div>
     <div id="orb-ring"></div>
   </div>
 
@@ -193,577 +277,590 @@ html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; }
   <nav id="rail">
     <div id="rail-title">Threshold</div>
     <div id="rail-divider"></div>
-    <div id="rail-nav" id="nav-items"></div>
+    <div id="rail-nav"></div>
     <div id="rail-pip"></div>
   </nav>
 
   <!-- Main content -->
   <main id="main">
 
-    <!-- TODAY -->
+    <!-- ============ 01 TODAY ============ -->
     <section class="section active" id="sec-TODAY" style="padding:56px 72px 64px 64px;display:flex;flex-direction:column;">
-      <div id="today-date" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;color:#6A675F;text-transform:uppercase"></div>
-      <div style="margin-top:11px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2.5px;color:#6A675F;text-transform:uppercase">CALICUT — 28°C, HUMID</div>
+      <div id="today-date" class="mono-cap" style="font-size:12px;letter-spacing:2.5px;"></div>
+      <div class="mono-cap" style="margin-top:11px;font-size:12px;letter-spacing:2.5px;">CALICUT — 28°C, HUMID</div>
 
-      <div style="margin-top:118px">
+      <div style="margin-top:108px">
         <h1 id="today-greeting" style="font-family:'Oswald',sans-serif;font-weight:700;font-size:104px;line-height:.9;letter-spacing:-1.5px;text-transform:uppercase;margin:0;color:#F4F1EA"></h1>
       </div>
 
-      <div style="margin-top:84px;max-width:600px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#6A675F">Today's North Star</div>
-        <p style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400">Ship the LEDGER screen of NoteOS v2. Nothing else moves until it's done.</p>
+      <div style="margin-top:80px;max-width:620px">
+        <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Today's North Star</div>
+        <p style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400">Ship the FOCUS timer in NoteOS, then clear today's FETS evaluations. Nothing else moves until those two are done.</p>
         <div style="margin-top:24px;width:100%;height:1px;background:rgba(244,241,234,.1)"></div>
       </div>
 
-      <div style="margin-top:auto;padding-top:72px;display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:0;border-top:1px solid rgba(244,241,234,.09)">
+      <div style="margin-top:auto;padding-top:64px;display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:0;border-top:1px solid rgba(244,241,234,.09)">
         <!-- Blocks -->
         <div style="padding:26px 36px 4px 0;border-right:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Blocks</div>
+          <div class="mono-cap" style="font-size:11px;">Blocks</div>
           <div style="margin-top:18px;display:flex;flex-direction:column;gap:13px">
-            <div style="display:flex;gap:16px;align-items:baseline">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">08:00</div>
-              <div style="font-size:14px;color:#C9C5BC">Beach road + coffee</div>
-            </div>
-            <div style="display:flex;gap:16px;align-items:baseline">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">09:30</div>
-              <div style="font-size:14px;color:#C9C5BC">Deep work — LEDGER screen</div>
-            </div>
-            <div style="display:flex;gap:16px;align-items:baseline">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">13:00</div>
-              <div style="font-size:14px;color:#C9C5BC">Client call — Tideline</div>
-            </div>
-            <div style="display:flex;gap:16px;align-items:baseline">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">17:00</div>
-              <div style="font-size:14px;color:#C9C5BC">Walk, then daybook</div>
-            </div>
+            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">08:00</div><div style="font-size:14px;color:#C9C5BC">Beach road + coffee</div></div>
+            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">09:30</div><div style="font-size:14px;color:#C9C5BC">Deep work — FOCUS timer</div></div>
+            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">11:00</div><div style="font-size:14px;color:#C9C5BC">FETS — Aptitude mock, Batch C</div></div>
+            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">17:00</div><div style="font-size:14px;color:#C9C5BC">Walk, then journal</div></div>
           </div>
         </div>
         <!-- Open Loops -->
         <div style="padding:26px 36px 4px;border-right:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Open Loops</div>
-          <div style="margin-top:18px;display:flex;flex-direction:column;gap:13px">
-            <div style="display:flex;gap:13px;align-items:center">
-              <div style="width:13px;height:13px;flex:none;border:1.5px solid rgba(244,241,234,.28);background:transparent"></div>
-              <div style="font-size:14px;color:#C9C5BC">Wire the LEDGER screen</div>
-            </div>
-            <div style="display:flex;gap:13px;align-items:center">
-              <div style="width:13px;height:13px;flex:none;border:1.5px solid rgba(244,241,234,.28);background:transparent"></div>
-              <div style="font-size:14px;color:#C9C5BC">Reply to two clients</div>
-            </div>
-            <div style="display:flex;gap:13px;align-items:center">
-              <div style="width:13px;height:13px;flex:none;border:1.5px solid rgba(244,241,234,.28);background:transparent"></div>
-              <div style="font-size:14px;color:#C9C5BC">Draft Salt &amp; Static #58</div>
-            </div>
-            <div style="display:flex;gap:13px;align-items:center">
-              <div style="width:13px;height:13px;flex:none;border:1.5px solid var(--accent);background:var(--accent)"></div>
-              <div style="font-size:14px;color:#5A5752;text-decoration:line-through">Renew noteos.in domain</div>
-            </div>
-          </div>
+          <div class="mono-cap" style="font-size:11px;">Open Loops</div>
+          <div id="today-loops" style="margin-top:18px;display:flex;flex-direction:column;gap:13px"></div>
         </div>
         <!-- Pulse -->
         <div style="padding:26px 0 4px 36px">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Pulse</div>
+          <div class="mono-cap" style="font-size:11px;">Pulse</div>
           <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Focus</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">3.5h</div>
-            </div>
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Shipped</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">2</div>
-            </div>
-            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Streak</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">12d</div>
-            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Focus</div><div id="pulse-focus" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0h</div></div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Done</div><div id="pulse-done" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0</div></div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Streak</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">12d</div></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VENTURES -->
-    <section class="section" id="sec-VENTURES" style="padding:54px 72px 80px 64px">
+    <!-- ============ 02 FOCUS ============ -->
+    <section class="section" id="sec-FOCUS" style="padding:54px 72px 80px 64px;">
       <div class="sec-header">
-        <div>
-          <div class="sec-label">02 · Ventures</div>
-          <h2 class="sec-title">Ventures</h2>
+        <div><div class="sec-label">02 · Focus</div><h2 class="sec-title">Focus</h2></div>
+        <div class="sec-desc">One task. One timer.<br>Nothing else.</div>
+      </div>
+
+      <div style="margin-top:64px;display:flex;flex-direction:column;align-items:center;text-align:center">
+        <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Now working on</div>
+        <input id="focus-task" value="Ship the FOCUS timer — NoteOS" spellcheck="false"
+          style="margin-top:14px;background:transparent;border:none;outline:none;text-align:center;font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.4px;color:#E6E2DA;width:min(640px,80vw)">
+
+        <div id="focus-clock" style="font-family:'Oswald',sans-serif;font-weight:700;font-size:160px;line-height:1;letter-spacing:-3px;color:#F4F1EA;margin:30px 0 8px;font-variant-numeric:tabular-nums">50:00</div>
+
+        <div style="display:flex;gap:10px;margin-bottom:34px">
+          <button class="chip" data-min="25">25 MIN</button>
+          <button class="chip active" data-min="50">50 MIN</button>
+          <button class="chip" data-min="90">90 MIN</button>
         </div>
+
+        <div style="display:flex;gap:14px">
+          <button id="focus-toggle" class="btn primary" style="min-width:150px">Start</button>
+          <button id="focus-reset" class="btn">Reset</button>
+        </div>
+
+        <div style="margin-top:54px;display:flex;gap:64px">
+          <div style="text-align:center"><div class="mono-cap" style="font-size:10px;">Sessions today</div><div id="focus-sessions" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:var(--accent);margin-top:6px">0</div></div>
+          <div style="text-align:center"><div class="mono-cap" style="font-size:10px;">Focused today</div><div id="focus-total" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">0h 00m</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 03 PROJECTS ============ -->
+    <section class="section" id="sec-PROJECTS" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">03 · Projects</div><h2 class="sec-title">Projects</h2></div>
         <div class="sec-desc">What I'm building<br>and what's gone quiet.</div>
       </div>
-      <div style="margin-top:8px">
-        <div class="venture-row" style="display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">V-01</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">NoteOS</div>
-            <div style="font-size:15px;color:#8E8A82;margin-top:5px">Personal command suite. The thing you are looking at.</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent)">BUILDING</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:7px">v2 · 71% to launch</div>
-          </div>
-        </div>
-        <div class="venture-row" style="display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">V-02</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">Studio Tideline</div>
-            <div style="font-size:15px;color:#8E8A82;margin-top:5px">Design + interface studio. Calicut.</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#C9C5BC">ACTIVE</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:7px">3 clients · 2 in pipeline</div>
-          </div>
-        </div>
-        <div class="venture-row" style="display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">V-03</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">Salt &amp; Static</div>
-            <div style="font-size:15px;color:#8E8A82;margin-top:5px">Weekly letter on tools, taste and the coast.</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8E8A82">STEADY</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:7px">1,420 readers</div>
+      <div style="margin-top:8px" id="projects-list"></div>
+    </section>
+
+    <!-- ============ 04 FETS ============ -->
+    <section class="section" id="sec-FETS" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">04 · FETS</div><h2 class="sec-title">FETS</h2></div>
+        <div class="sec-desc">Testing &amp; educational<br>services — the company.</div>
+      </div>
+
+      <!-- Stats -->
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:0">
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Active Students</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">128</div></div>
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Live Batches</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">6</div></div>
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">This Month</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:var(--accent);margin-top:10px">+ ₹ 1.4L</div></div>
+      </div>
+
+      <div style="margin-top:44px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px">
+        <!-- Today's sessions -->
+        <div>
+          <div class="mono-cap" style="font-size:11px;">Today's Sessions</div>
+          <div style="margin-top:14px">
+            <div style="display:grid;grid-template-columns:96px 1fr auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">09:30</div><div style="font-size:15px;color:#C9C5BC">Aptitude Mock — Batch C</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">42 seats</div></div>
+            <div style="display:grid;grid-template-columns:96px 1fr auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">11:30</div><div style="font-size:15px;color:#C9C5BC">Spoken English — Eve Batch</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">live</div></div>
+            <div style="display:grid;grid-template-columns:96px 1fr auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">14:00</div><div style="font-size:15px;color:#C9C5BC">Paper evaluation block</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">24 left</div></div>
+            <div style="display:grid;grid-template-columns:96px 1fr auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">16:30</div><div style="font-size:15px;color:#C9C5BC">Corporate testing — TCS prep</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">on-site</div></div>
           </div>
         </div>
-        <div class="venture-row" style="display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">V-04</div>
+        <!-- Needs attention + batches -->
+        <div style="display:flex;flex-direction:column;gap:26px">
           <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">Archive 47</div>
-            <div style="font-size:15px;color:#8E8A82;margin-top:5px">A photo project. Shelved, not dead.</div>
+            <div class="mono-cap" style="font-size:11px;">Needs Attention</div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
+              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Papers to evaluate</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">24</div></div>
+              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Fees pending</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">₹ 38K</div></div>
+              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">New enrolment leads</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">5</div></div>
+              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Next exam · 28 Jun</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#8E8A82">6 days</div></div>
+            </div>
           </div>
-          <div style="text-align:right">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5A5752">DORMANT</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:7px">last touched · Apr 2026</div>
+          <div style="border:1px solid rgba(244,241,234,.09);padding:24px">
+            <div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Top batch this month</div>
+            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:28px;text-transform:uppercase;color:#E6E2DA;margin-top:8px;line-height:1.1">Bank Prep — Batch A</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752;margin-top:8px">38 students · 94% attendance</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- VAULT -->
-    <section class="section" id="sec-VAULT" style="padding:54px 72px 80px 64px">
+    <!-- ============ 05 TASKS ============ -->
+    <section class="section" id="sec-TASKS" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div>
-          <div class="sec-label">03 · Vault</div>
-          <h2 class="sec-title">Vault</h2>
-        </div>
-        <div class="sec-desc">Fragments worth<br>keeping.</div>
+        <div><div class="sec-label">05 · Tasks</div><h2 class="sec-title">Tasks</h2></div>
+        <div class="sec-desc">Open loops.<br>Close them.</div>
       </div>
-      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">PRINCIPLE</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">Make the boring parts beautiful.</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">note · 2024</div>
+      <div style="margin-top:30px;max-width:760px" id="tasks-list"></div>
+      <div id="tasks-summary" class="mono-cap" style="margin-top:28px;font-size:11px;"></div>
+    </section>
+
+    <!-- ============ 06 HABITS ============ -->
+    <section class="section" id="sec-HABITS" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">06 · Habits</div><h2 class="sec-title">Habits</h2></div>
+        <div class="sec-desc">What holds steady<br>when everything moves.</div>
+      </div>
+      <div style="margin-top:32px;max-width:680px" id="habits-list"></div>
+    </section>
+
+    <!-- ============ 07 HEALTH ============ -->
+    <section class="section" id="sec-HEALTH" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">07 · Health</div><h2 class="sec-title">Health</h2></div>
+        <div class="sec-desc">The body runs<br>the whole thing.</div>
+      </div>
+      <div style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:56px;max-width:900px">
+        <!-- Water -->
+        <div>
+          <div class="mono-cap" style="font-size:11px;">Water · goal 8 glasses</div>
+          <div style="margin-top:20px;display:flex;align-items:center;gap:18px">
+            <button class="step-btn" id="water-minus">−</button>
+            <div style="display:flex;gap:7px" id="water-pips"></div>
+            <button class="step-btn" id="water-plus">+</button>
+          </div>
+          <div id="water-count" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:var(--accent);margin-top:22px">0 / 8</div>
         </div>
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">SNIPPET</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">writing-mode: vertical-rl for rail labels</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">codepen</div>
-        </div>
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">LINK</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">The Garden and the Stream</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">tomcritchlow.com</div>
-        </div>
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">QUOTE</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">"Tools amplify whatever you bring to them."</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">—</div>
-        </div>
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">IDEA</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">A daybook that drafts the weekly brief itself.</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">shower · today</div>
-        </div>
-        <div class="vault-card" style="background:#0B0B0C;padding:26px 24px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .18s">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent)">REFERENCE</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:21px;line-height:1.15;color:#E6E2DA;margin:22px 0 16px">Grid Systems — Müller-Brockmann</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">the shelf</div>
+        <!-- Workout + sleep -->
+        <div style="display:flex;flex-direction:column;gap:32px">
+          <div>
+            <div class="mono-cap" style="font-size:11px;">Workout today</div>
+            <div style="margin-top:18px;display:flex;align-items:center;gap:16px">
+              <div class="habit-pip" id="workout-pip"></div>
+              <div id="workout-label" style="font-size:17px;color:#C9C5BC">Not done yet</div>
+            </div>
+          </div>
+          <div>
+            <div class="mono-cap" style="font-size:11px;">Last night's sleep</div>
+            <div style="margin-top:14px;display:flex;align-items:baseline;gap:16px">
+              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA">7h 20m</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">slept 23:40 · woke 07:00</div>
+            </div>
+          </div>
+          <div>
+            <div class="mono-cap" style="font-size:11px;">Steps</div>
+            <div style="margin-top:14px;display:flex;align-items:baseline;gap:16px">
+              <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA">6,240</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">goal 8,000</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- LEDGER -->
-    <section class="section" id="sec-LEDGER" style="padding:54px 72px 80px 64px">
+    <!-- ============ 08 LEARN ============ -->
+    <section class="section" id="sec-LEARN" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div>
-          <div class="sec-label">04 · Ledger</div>
-          <h2 class="sec-title">Ledger</h2>
-        </div>
+        <div><div class="sec-label">08 · Learn</div><h2 class="sec-title">Learn</h2></div>
+        <div class="sec-desc">Sharpening the axe,<br>a little each day.</div>
+      </div>
+      <div style="margin-top:30px" id="learn-list"></div>
+    </section>
+
+    <!-- ============ 09 FINANCE ============ -->
+    <section class="section" id="sec-FINANCE" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">09 · Finance</div><h2 class="sec-title">Finance</h2></div>
         <div class="sec-desc">Runway, not score.</div>
       </div>
       <div style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:0">
-        <div style="padding:6px 32px 6px 0">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">Net Position</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">₹ 18.4L</div>
-        </div>
-        <div style="padding:6px 32px 6px 0">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">Runway</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">14 mo</div>
-        </div>
-        <div style="padding:6px 32px 6px 0">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">This Month</div>
-          <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:var(--accent);margin-top:10px">+ ₹ 92.4K</div>
-        </div>
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Net Position</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">₹ 18.4L</div></div>
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Runway</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">14 mo</div></div>
+        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">This Month</div><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:var(--accent);margin-top:10px">+ ₹ 1.4L</div></div>
       </div>
-      <div style="margin-top:44px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Recent Movement</div>
-      <div style="margin-top:10px">
-        <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">21 JUN</div>
-          <div style="font-size:15px;color:#C9C5BC">Studio Tideline — retainer</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent)">+ ₹ 60,000</div>
-        </div>
-        <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">19 JUN</div>
-          <div style="font-size:15px;color:#C9C5BC">AWS + Vercel</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#8E8A82">− ₹ 4,210</div>
-        </div>
-        <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">18 JUN</div>
-          <div style="font-size:15px;color:#C9C5BC">Salt &amp; Static — sponsor</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent)">+ ₹ 18,000</div>
-        </div>
-        <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">15 JUN</div>
-          <div style="font-size:15px;color:#C9C5BC">Rent — Calicut</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#8E8A82">− ₹ 22,000</div>
-        </div>
-        <div style="display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">12 JUN</div>
-          <div style="font-size:15px;color:#C9C5BC">Camera lens — Archive 47</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#8E8A82">− ₹ 31,500</div>
-        </div>
-      </div>
+      <div class="mono-cap" style="margin-top:44px;font-size:11px;">Recent Movement</div>
+      <div style="margin-top:10px" id="finance-list"></div>
     </section>
 
-    <!-- ANCHOR -->
-    <section class="section" id="sec-ANCHOR" style="padding:54px 72px 80px 64px">
+    <!-- ============ 10 JOURNAL ============ -->
+    <section class="section" id="sec-JOURNAL" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div>
-          <div class="sec-label">05 · Anchor</div>
-          <h2 class="sec-title">Anchor</h2>
-        </div>
-        <div class="sec-desc">What holds steady<br>when everything moves.</div>
-      </div>
-      <div style="margin-top:38px;display:grid;grid-template-columns:1.3fr 1fr;gap:56px">
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:20px">Operating Principles</div>
-          <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent)">01</div>
-            <div style="font-size:18px;line-height:1.4;color:#D4D0C8">Default to shipping. Taste is edited, not planned.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent)">02</div>
-            <div style="font-size:18px;line-height:1.4;color:#D4D0C8">One north star a day. The rest is noise.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent)">03</div>
-            <div style="font-size:18px;line-height:1.4;color:#D4D0C8">Protect the mornings. Make them sacred.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent)">04</div>
-            <div style="font-size:18px;line-height:1.4;color:#D4D0C8">Money is runway, not a scoreboard.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:42px 1fr;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;color:var(--accent)">05</div>
-            <div style="font-size:18px;line-height:1.4;color:#D4D0C8">Leave the coast better than you found it.</div>
-          </div>
-        </div>
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:20px">Daily Anchors</div>
-          <div style="display:flex;flex-direction:column;gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
-            <div style="background:#0B0B0C;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;text-transform:uppercase;letter-spacing:.5px;color:#E6E2DA">Deep Work</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">12 day streak</div>
-            </div>
-            <div style="background:#0B0B0C;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;text-transform:uppercase;letter-spacing:.5px;color:#E6E2DA">Walk · Beach Rd</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">31 day streak</div>
-            </div>
-            <div style="background:#0B0B0C;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;text-transform:uppercase;letter-spacing:.5px;color:#E6E2DA">No Screens After 10</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">4 day streak</div>
-            </div>
-            <div style="background:#0B0B0C;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:18px;text-transform:uppercase;letter-spacing:.5px;color:#E6E2DA">Write 200 Words</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">9 day streak</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DAYBOOK -->
-    <section class="section" id="sec-DAYBOOK" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div>
-          <div class="sec-label">06 · Daybook</div>
-          <h2 class="sec-title">Daybook</h2>
-        </div>
+        <div><div class="sec-label">10 · Journal</div><h2 class="sec-title">Journal</h2></div>
         <div class="sec-desc">A line a day,<br>most days.</div>
       </div>
-      <div style="margin-top:20px;max-width:760px">
-        <div style="display:grid;grid-template-columns:120px 1fr;gap:30px;padding:30px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);padding-top:6px">21 JUN 2026</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:25px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">The rail finally clicks</div>
-            <div style="font-size:16px;line-height:1.6;color:#9A968E;margin-top:9px">Rotated the navigation onto its side. Suddenly the whole thing reads like an instrument instead of a webpage.</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:120px 1fr;gap:30px;padding:30px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);padding-top:6px">20 JUN 2026</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:25px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">A slow Friday</div>
-            <div style="font-size:16px;line-height:1.6;color:#9A968E;margin-top:9px">Walked the beach road twice and read instead of building. Needed it more than I admitted.</div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:120px 1fr;gap:30px;padding:30px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);padding-top:6px">18 JUN 2026</div>
-          <div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:25px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">First sponsor said yes</div>
-            <div style="font-size:16px;line-height:1.6;color:#9A968E;margin-top:9px">Salt &amp; Static has its first real backer. Small money, but it changes how the whole thing feels.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- HORIZON -->
-    <section class="section" id="sec-HORIZON" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div>
-          <div class="sec-label">07 · Horizon</div>
-          <h2 class="sec-title">Horizon</h2>
-        </div>
-        <div class="sec-desc">Where this is<br>all pointed.</div>
-      </div>
-      <div style="margin-top:30px">
-        <div style="padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
-            <div style="display:flex;align-items:baseline;gap:22px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">This Quarter</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">Launch NoteOS v2</div>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)">71%</div>
-          </div>
-          <div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)">
-            <div style="height:2px;width:71%;background:var(--accent)"></div>
-          </div>
-        </div>
-        <div style="padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
-            <div style="display:flex;align-items:baseline;gap:22px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">2026</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">2,500 readers on the letter</div>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)">57%</div>
-          </div>
-          <div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)">
-            <div style="height:2px;width:57%;background:var(--accent)"></div>
-          </div>
-        </div>
-        <div style="padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
-            <div style="display:flex;align-items:baseline;gap:22px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">2026</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">Studio to ₹5L / mo recurring</div>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)">38%</div>
-          </div>
-          <div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)">
-            <div style="height:2px;width:38%;background:var(--accent)"></div>
-          </div>
-        </div>
-        <div style="padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">
-            <div style="display:flex;align-items:baseline;gap:22px">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">3 Years</div>
-              <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">The house by the water</div>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)">12%</div>
-          </div>
-          <div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)">
-            <div style="height:2px;width:12%;background:var(--accent)"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ALMANAC -->
-    <section class="section" id="sec-ALMANAC" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div>
-          <div class="sec-label">08 · Almanac</div>
-          <h2 class="sec-title">Almanac</h2>
-        </div>
-        <div class="sec-desc">Dates, cycles,<br>things not to forget.</div>
-      </div>
-      <div style="margin-top:38px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px">
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:14px">Upcoming</div>
-          <div style="display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">24 JUN</div>
-            <div style="font-size:15px;color:#C9C5BC">Domain renewal · noteos.in</div>
-          </div>
-          <div style="display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">28 JUN</div>
-            <div style="font-size:15px;color:#C9C5BC">Amma — birthday</div>
-          </div>
-          <div style="display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">01 JUL</div>
-            <div style="font-size:15px;color:#C9C5BC">Quarterly review</div>
-          </div>
-          <div style="display:grid;grid-template-columns:84px 1fr;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">08 JUL</div>
-            <div style="font-size:15px;color:#C9C5BC">Tideline shoot · Kappad beach</div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:26px">
-          <div style="border:1px solid rgba(244,241,234,.09);padding:26px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">On This Day</div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:24px;line-height:1.2;color:#E6E2DA;margin-top:14px">21 June — the solstice. The longest light of the year. Build accordingly.</div>
-          </div>
-          <div style="border:1px solid rgba(244,241,234,.09);padding:26px;display:flex;align-items:center;justify-content:space-between;gap:16px">
-            <div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F">Moon</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#C9C5BC;margin-top:10px">WANING GIBBOUS · 78%</div>
-            </div>
-            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(90deg,#1C1C1E 0 22%,#E6E2DA 22% 100%);border:1px solid rgba(244,241,234,.12)"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BRIEF -->
-    <section class="section" id="sec-BRIEF" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div>
-          <div class="sec-label">09 · Brief</div>
-          <h2 class="sec-title">Brief</h2>
-        </div>
-        <div class="sec-desc">The day, compressed.</div>
-      </div>
-      <div style="margin-top:38px;display:grid;grid-template-columns:1.4fr 1fr;gap:56px">
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:8px">Signals</div>
-          <div style="display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">01</div>
-            <div style="font-size:19px;line-height:1.45;color:#D4D0C8">NoteOS v2 is 71% done — the LEDGER screen is the last gate. Push it today.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">02</div>
-            <div style="font-size:19px;line-height:1.45;color:#D4D0C8">Two client replies are pending. Send both before noon.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:baseline;padding:22px 0;border-bottom:1px solid rgba(244,241,234,.07)">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">03</div>
-            <div style="font-size:19px;line-height:1.45;color:#D4D0C8">Issue #58 of the letter drafts itself from this week's daybook.</div>
-          </div>
-        </div>
-        <div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#6A675F;margin-bottom:18px">Reading Queue</div>
-          <div style="padding:15px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;color:#E6E2DA">The Garden and the Stream</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:5px">Tom Critchlow</div>
-          </div>
-          <div style="padding:15px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;color:#E6E2DA">Working in Public</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:5px">Nadia Eghbal</div>
-          </div>
-          <div style="padding:15px 0;border-bottom:1px solid rgba(244,241,234,.06)">
-            <div style="font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;color:#E6E2DA">A Pattern Language</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752;margin-top:5px">C. Alexander</div>
-          </div>
-          <div style="margin-top:30px;border:1px solid rgba(244,241,234,.09);padding:24px">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F">Today reduces to</div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:700;font-size:40px;text-transform:uppercase;color:var(--accent);margin-top:8px;line-height:1">One ship.</div>
-          </div>
-        </div>
-      </div>
+      <div style="margin-top:20px;max-width:760px" id="journal-list"></div>
     </section>
 
   </main>
 </div>
 
-<style>
-.venture-row { transition: background .18s; }
-.venture-row:hover { background: rgba(244,241,234,.02); }
-.vault-card:hover { background: #0E0E10 !important; }
-</style>
-
 <script>
 (function () {
-  const DAYS = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
-  const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-  const SECTIONS = ['TODAY','VENTURES','VAULT','LEDGER','ANCHOR','DAYBOOK','HORIZON','ALMANAC','BRIEF'];
+  "use strict";
 
-  let current = 'TODAY';
+  var DAYS = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  var MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  var SECTIONS = ['TODAY','FOCUS','PROJECTS','FETS','TASKS','HABITS','HEALTH','LEARN','FINANCE','JOURNAL'];
+  var FLEX_SECTIONS = { TODAY: 1 };
+  var NAME = 'MITHUN';
 
-  // Build nav items
-  const navEl = document.getElementById('rail-nav');
-  SECTIONS.forEach(function(name, i) {
-    const el = document.createElement('div');
-    el.className = 'nav-item' + (name === 'TODAY' ? ' active' : '');
-    el.textContent = name;
-    el.dataset.section = name;
-    el.addEventListener('click', function() { goTo(name); });
-    navEl.appendChild(el);
+  // ── tiny persistence helpers ──
+  function todayKey() { return new Date().toISOString().slice(0, 10); }
+  function load(key, fallback) {
+    try { var v = localStorage.getItem('threshold:' + key); return v == null ? fallback : JSON.parse(v); }
+    catch (e) { return fallback; }
+  }
+  function save(key, val) {
+    try { localStorage.setItem('threshold:' + key, JSON.stringify(val)); } catch (e) {}
+  }
+  function el(tag, attrs, html) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  // ════════════════════ NAV ════════════════════
+  var current = 'TODAY';
+  var navEl = document.getElementById('rail-nav');
+  SECTIONS.forEach(function (name) {
+    var n = el('div', { class: 'nav-item' + (name === 'TODAY' ? ' active' : '') });
+    n.textContent = name;
+    n.dataset.section = name;
+    n.addEventListener('click', function () { goTo(name); });
+    navEl.appendChild(n);
+  });
+  SECTIONS.forEach(function (name) {
+    var s = document.getElementById('sec-' + name);
+    if (s && name !== 'TODAY') s.style.display = 'none';
   });
 
   function goTo(name) {
     if (name === current) return;
-
-    // Update nav
-    document.querySelectorAll('.nav-item').forEach(function(el) {
-      el.classList.toggle('active', el.dataset.section === name);
+    document.querySelectorAll('.nav-item').forEach(function (n) {
+      n.classList.toggle('active', n.dataset.section === name);
     });
-
-    // Switch section
-    document.querySelectorAll('.section').forEach(function(el) {
-      el.classList.remove('active');
-      el.style.display = 'none';
+    document.querySelectorAll('.section').forEach(function (s) {
+      s.classList.remove('active'); s.style.display = 'none';
     });
-
-    const next = document.getElementById('sec-' + name);
+    var next = document.getElementById('sec-' + name);
     if (next) {
-      next.style.display = name === 'TODAY' ? 'flex' : 'block';
+      next.style.display = FLEX_SECTIONS[name] ? 'flex' : 'block';
       next.classList.add('active');
     }
-
-    // Scroll to top + animate
-    const main = document.getElementById('main');
+    var main = document.getElementById('main');
     main.scrollTop = 0;
     main.animate(
       [{ opacity: 0.35, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }],
       { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' }
     );
-
     current = name;
   }
 
-  // Initialize section display states
-  SECTIONS.forEach(function(name) {
-    const el = document.getElementById('sec-' + name);
-    if (el && name !== 'TODAY') el.style.display = 'none';
-  });
-
-  // Clock / greeting / orb
+  // ════════════════════ CLOCK / GREETING / ORB ════════════════════
   function tick() {
-    const now = new Date();
-    const h = now.getHours();
-    const greeting = h < 12 ? 'GOOD MORNING' : h < 17 ? 'GOOD AFTERNOON' : h < 21 ? 'GOOD EVENING' : 'GOOD NIGHT';
-    const dateLine = DAYS[now.getDay()] + ', ' + now.getDate() + ' ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
-    const dayFrac = (h * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 86400;
-    const dayDeg = Math.round(dayFrac * 360);
-
-    const dateEl = document.getElementById('today-date');
-    if (dateEl) dateEl.textContent = dateLine;
-
-    const greetEl = document.getElementById('today-greeting');
-    if (greetEl) greetEl.innerHTML = greeting + ',<br><span style="color:var(--accent)">MITHUN</span>';
-
-    const orbInner = document.getElementById('orb-inner');
-    if (orbInner) orbInner.style.transform = 'rotate(' + dayDeg + 'deg)';
+    var now = new Date();
+    var h = now.getHours();
+    var greeting = h < 12 ? 'GOOD MORNING' : h < 17 ? 'GOOD AFTERNOON' : h < 21 ? 'GOOD EVENING' : 'GOOD NIGHT';
+    document.getElementById('today-date').textContent =
+      DAYS[now.getDay()] + ', ' + now.getDate() + ' ' + MONTHS[now.getMonth()] + ' ' + now.getFullYear();
+    document.getElementById('today-greeting').innerHTML =
+      greeting + ',<br><span style="color:var(--accent)">' + NAME + '</span>';
+    var frac = (h * 3600 + now.getMinutes() * 60 + now.getSeconds()) / 86400;
+    document.getElementById('orb-inner').style.transform = 'rotate(' + Math.round(frac * 360) + 'deg)';
   }
-
   tick();
   setInterval(tick, 30000);
+
+  // ════════════════════ FOCUS TIMER ════════════════════
+  (function () {
+    var presetMin = 50, remaining = presetMin * 60, running = false, timer = null;
+    var fkey = 'focus:' + todayKey();
+    var stats = load(fkey, { sessions: 0, seconds: 0 });
+
+    var clock = document.getElementById('focus-clock');
+    var toggle = document.getElementById('focus-toggle');
+    var resetBtn = document.getElementById('focus-reset');
+    var chips = document.querySelectorAll('#sec-FOCUS .chip');
+
+    function fmt(s) {
+      var m = Math.floor(s / 60), ss = s % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+    function fmtTotal(sec) {
+      var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+      return h + 'h ' + (m < 10 ? '0' : '') + m + 'm';
+    }
+    function renderStats() {
+      document.getElementById('focus-sessions').textContent = stats.sessions;
+      document.getElementById('focus-total').textContent = fmtTotal(stats.seconds);
+      // mirror into TODAY pulse
+      var pf = document.getElementById('pulse-focus');
+      if (pf) pf.textContent = (stats.seconds / 3600).toFixed(1) + 'h';
+    }
+    function renderClock() { clock.textContent = fmt(remaining); }
+
+    function stop() { running = false; clearInterval(timer); timer = null; toggle.textContent = 'Start'; toggle.classList.add('primary'); }
+    function start() {
+      running = true; toggle.textContent = 'Pause'; toggle.classList.remove('primary');
+      timer = setInterval(function () {
+        remaining--;
+        if (remaining <= 0) {
+          stats.sessions += 1; stats.seconds += presetMin * 60; save(fkey, stats); renderStats();
+          remaining = presetMin * 60; stop(); renderClock();
+          return;
+        }
+        // accrue focus time live
+        stats.seconds += 1; if (remaining % 30 === 0) save(fkey, stats);
+        renderStats(); renderClock();
+      }, 1000);
+    }
+    toggle.addEventListener('click', function () { running ? stop() : start(); });
+    resetBtn.addEventListener('click', function () { stop(); remaining = presetMin * 60; renderClock(); });
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        if (running) return;
+        chips.forEach(function (x) { x.classList.remove('active'); });
+        c.classList.add('active');
+        presetMin = parseInt(c.dataset.min, 10);
+        remaining = presetMin * 60; renderClock();
+      });
+    });
+    renderClock(); renderStats();
+  })();
+
+  // ════════════════════ PROJECTS ════════════════════
+  (function () {
+    var statusColor = { BUILDING: 'var(--accent)', ACTIVE: '#C9C5BC', STEADY: '#8E8A82', PAUSED: '#5A5752' };
+    var rows = [
+      { idx: 'P-01', name: 'NoteOS', desc: 'Personal command suite — the thing you are looking at.', status: 'BUILDING', metric: 'main · 71% to v2' },
+      { idx: 'P-02', name: 'FETS Portal', desc: 'Student, batch & exam portal for the company.', status: 'ACTIVE', metric: 'feat/exams · in review' },
+      { idx: 'P-03', name: 'Salt & Static', desc: 'Site + weekly newsletter engine.', status: 'STEADY', metric: '1,420 readers' },
+      { idx: 'P-04', name: 'Archive 47', desc: 'A photo project. Shelved, not dead.', status: 'PAUSED', metric: 'last · Apr 2026' }
+    ];
+    var c = document.getElementById('projects-list');
+    rows.forEach(function (v) {
+      var r = el('div', { class: 'venture-row', style: 'display:grid;grid-template-columns:62px 1fr auto;gap:28px;align-items:center;padding:26px 8px 26px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      r.innerHTML =
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#5A5752">' + v.idx + '</div>' +
+        '<div><div style="font-family:\'Oswald\',sans-serif;font-weight:600;font-size:30px;letter-spacing:.5px;text-transform:uppercase;color:#F4F1EA">' + v.name + '</div>' +
+        '<div style="font-size:15px;color:#8E8A82;margin-top:5px">' + v.desc + '</div></div>' +
+        '<div style="text-align:right"><div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:' + statusColor[v.status] + '">' + v.status + '</div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#5A5752;margin-top:7px">' + v.metric + '</div></div>';
+      c.appendChild(r);
+    });
+  })();
+
+  // ════════════════════ TASKS (persisted) ════════════════════
+  (function () {
+    var defs = [
+      { id: 't1', p: 'P1', label: 'Ship the FOCUS timer — NoteOS' },
+      { id: 't2', p: 'P1', label: 'Evaluate FETS aptitude papers (24)' },
+      { id: 't3', p: 'P2', label: 'Reply to two client emails' },
+      { id: 't4', p: 'P2', label: 'Push FETS portal exam module to review' },
+      { id: 't5', p: 'P3', label: 'Draft Salt & Static #58' },
+      { id: 't6', p: 'P3', label: 'Renew noteos.in domain' }
+    ];
+    var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
+    var state = load('tasks', { t6: true });
+    var listEl = document.getElementById('tasks-list');
+    var sumEl = document.getElementById('tasks-summary');
+    var loopsEl = document.getElementById('today-loops');
+
+    function render() {
+      listEl.innerHTML = ''; loopsEl.innerHTML = '';
+      var doneCount = 0;
+      defs.forEach(function (t) {
+        var done = !!state[t.id]; if (done) doneCount++;
+        var row = el('div', { class: 'task-row' + (done ? ' done' : ''), style: 'display:grid;grid-template-columns:18px 44px 1fr;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+        row.innerHTML =
+          '<div class="check"></div>' +
+          '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;letter-spacing:1px;color:' + pColor[t.p] + '">' + t.p + '</div>' +
+          '<div class="task-label" style="font-size:17px;color:#C9C5BC">' + t.label + '</div>';
+        row.addEventListener('click', function () {
+          state[t.id] = !state[t.id]; save('tasks', state); render();
+        });
+        listEl.appendChild(row);
+      });
+      sumEl.textContent = doneCount + ' of ' + defs.length + ' closed today';
+
+      // TODAY open-loops mirror: first 4 undone (then filler done ones)
+      var open = defs.filter(function (t) { return !state[t.id]; }).slice(0, 4);
+      if (open.length < 4) open = open.concat(defs.filter(function (t) { return state[t.id]; }).slice(0, 4 - open.length));
+      open.forEach(function (t) {
+        var done = !!state[t.id];
+        var d = el('div', { style: 'display:flex;gap:13px;align-items:center' });
+        d.innerHTML =
+          '<div style="width:13px;height:13px;flex:none;border:1.5px solid ' + (done ? 'var(--accent)' : 'rgba(244,241,234,.28)') + ';background:' + (done ? 'var(--accent)' : 'transparent') + '"></div>' +
+          '<div style="font-size:14px;color:' + (done ? '#5A5752' : '#C9C5BC') + ';text-decoration:' + (done ? 'line-through' : 'none') + '">' + t.label + '</div>';
+        loopsEl.appendChild(d);
+      });
+      var pd = document.getElementById('pulse-done'); if (pd) pd.textContent = doneCount;
+    }
+    render();
+  })();
+
+  // ════════════════════ HABITS (persisted) ════════════════════
+  (function () {
+    var defs = [
+      { id: 'h1', name: 'Deep Work', base: 12 },
+      { id: 'h2', name: 'Morning Walk', base: 31 },
+      { id: 'h3', name: 'Read 30 min', base: 9 },
+      { id: 'h4', name: 'Daily Commit', base: 18 },
+      { id: 'h5', name: 'No Screens After 10', base: 4 }
+    ];
+    var state = load('habits', {}); // { h1: { last: 'YYYY-MM-DD', streak: n } }
+    var listEl = document.getElementById('habits-list');
+
+    function streakOf(t) {
+      var s = state[t.id];
+      return s && typeof s.streak === 'number' ? s.streak : t.base;
+    }
+    function doneToday(t) {
+      var s = state[t.id];
+      return s && s.last === todayKey();
+    }
+    function render() {
+      listEl.innerHTML = '';
+      defs.forEach(function (t) {
+        var done = doneToday(t);
+        var row = el('div', { style: 'display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+        var left = el('div', { style: 'display:flex;align-items:center;gap:18px' });
+        var pip = el('div', { class: 'habit-pip' + (done ? ' done' : '') });
+        var label = el('div', null,
+          '<div style="font-family:\'Oswald\',sans-serif;font-weight:500;font-size:21px;text-transform:uppercase;letter-spacing:.4px;color:#E6E2DA">' + t.name + '</div>');
+        left.appendChild(pip); left.appendChild(label);
+        var streak = el('div', { style: 'font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--accent)' },
+          streakOf(t) + ' day streak');
+        row.appendChild(left); row.appendChild(streak);
+
+        pip.addEventListener('click', function () {
+          var cur = streakOf(t);
+          if (doneToday(t)) { state[t.id] = { last: '', streak: Math.max(0, cur - 1) }; }
+          else { state[t.id] = { last: todayKey(), streak: cur + 1 }; }
+          save('habits', state); render();
+        });
+        listEl.appendChild(row);
+      });
+    }
+    render();
+  })();
+
+  // ════════════════════ HEALTH (persisted) ════════════════════
+  (function () {
+    var wkey = 'water:' + todayKey();
+    var glasses = load(wkey, 0);
+    var pipsEl = document.getElementById('water-pips');
+    var countEl = document.getElementById('water-count');
+
+    function renderWater() {
+      pipsEl.innerHTML = '';
+      for (var i = 0; i < 8; i++) {
+        pipsEl.appendChild(el('div', { class: 'water-pip' + (i < glasses ? ' full' : '') }));
+      }
+      countEl.textContent = glasses + ' / 8';
+    }
+    document.getElementById('water-plus').addEventListener('click', function () {
+      if (glasses < 8) { glasses++; save(wkey, glasses); renderWater(); }
+    });
+    document.getElementById('water-minus').addEventListener('click', function () {
+      if (glasses > 0) { glasses--; save(wkey, glasses); renderWater(); }
+    });
+    renderWater();
+
+    var owkey = 'workout:' + todayKey();
+    var wDone = load(owkey, false);
+    var wpip = document.getElementById('workout-pip');
+    var wlabel = document.getElementById('workout-label');
+    function renderWorkout() {
+      wpip.classList.toggle('done', wDone);
+      wlabel.textContent = wDone ? 'Done — nice.' : 'Not done yet';
+      wlabel.style.color = wDone ? 'var(--accent)' : '#C9C5BC';
+    }
+    wpip.addEventListener('click', function () { wDone = !wDone; save(owkey, wDone); renderWorkout(); });
+    renderWorkout();
+  })();
+
+  // ════════════════════ LEARN ════════════════════
+  (function () {
+    var items = [
+      { when: 'In progress', title: 'System Design — ByteByteGo', pct: 62 },
+      { when: 'For FETS', title: 'Building automated test banks', pct: 80 },
+      { when: 'Slow burn', title: 'The Rust Book', pct: 40 },
+      { when: 'Next up', title: 'Postgres Internals', pct: 25 }
+    ];
+    var c = document.getElementById('learn-list');
+    items.forEach(function (g) {
+      var r = el('div', { style: 'padding:28px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      r.innerHTML =
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px">' +
+          '<div style="display:flex;align-items:baseline;gap:22px">' +
+            '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6A675F;min-width:108px">' + g.when + '</div>' +
+            '<div style="font-family:\'Oswald\',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">' + g.title + '</div>' +
+          '</div>' +
+          '<div style="font-family:\'JetBrains Mono\',monospace;font-size:14px;color:var(--accent)">' + g.pct + '%</div>' +
+        '</div>' +
+        '<div style="margin-top:16px;height:2px;width:100%;background:rgba(244,241,234,.09)"><div style="height:2px;width:' + g.pct + '%;background:var(--accent)"></div></div>';
+      c.appendChild(r);
+    });
+  })();
+
+  // ════════════════════ FINANCE ════════════════════
+  (function () {
+    var entries = [
+      { d: '21 JUN', label: 'FETS — June batch fees', amt: '+ ₹ 96,000', up: true },
+      { d: '20 JUN', label: 'Studio Tideline — retainer', amt: '+ ₹ 60,000', up: true },
+      { d: '19 JUN', label: 'AWS + Vercel', amt: '− ₹ 4,210', up: false },
+      { d: '18 JUN', label: 'Exam hall rent — FETS', amt: '− ₹ 12,000', up: false },
+      { d: '15 JUN', label: 'Rent — Calicut', amt: '− ₹ 22,000', up: false }
+    ];
+    var c = document.getElementById('finance-list');
+    entries.forEach(function (e) {
+      var r = el('div', { style: 'display:grid;grid-template-columns:96px 1fr auto;gap:24px;align-items:center;padding:17px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      r.innerHTML =
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#5A5752">' + e.d + '</div>' +
+        '<div style="font-size:15px;color:#C9C5BC">' + e.label + '</div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:15px;color:' + (e.up ? 'var(--accent)' : '#8E8A82') + '">' + e.amt + '</div>';
+      c.appendChild(r);
+    });
+  })();
+
+  // ════════════════════ JOURNAL ════════════════════
+  (function () {
+    var items = [
+      { d: '21 JUN 2026', t: 'The rail finally clicks', body: 'Rotated the navigation onto its side. Suddenly the whole thing reads like an instrument instead of a webpage.' },
+      { d: '20 JUN 2026', t: 'FETS exams to review', body: 'Pushed the exam module of the FETS portal for review. The evaluation backlog is the real bottleneck now — automate it next.' },
+      { d: '18 JUN 2026', t: 'First corporate testing client', body: 'Signed a corporate testing contract for FETS. Small money, but it changes how the whole thing feels.' }
+    ];
+    var c = document.getElementById('journal-list');
+    items.forEach(function (d) {
+      var r = el('div', { style: 'display:grid;grid-template-columns:120px 1fr;gap:30px;padding:30px 0;border-bottom:1px solid rgba(244,241,234,.07)' });
+      r.innerHTML =
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);padding-top:6px">' + d.d + '</div>' +
+        '<div><div style="font-family:\'Oswald\',sans-serif;font-weight:500;font-size:25px;text-transform:uppercase;letter-spacing:.3px;color:#F4F1EA">' + d.t + '</div>' +
+        '<div style="font-size:16px;line-height:1.6;color:#9A968E;margin-top:9px">' + d.body + '</div></div>';
+      c.appendChild(r);
+    });
+  })();
+
 })();
 </script>
 </body>
