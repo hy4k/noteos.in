@@ -64,7 +64,11 @@ rsync -avz --delete \
   -e "$RSYNC_SSH" \
   --include='index.html' \
   --include='supabase-config.js' \
+  --include='manifest.json' \
+  --include='sw.js' \
   --include='README.md' \
+  --include='icons/' \
+  --include='icons/***' \
   --exclude='*' \
   ./ "${TARGET}:${VPS_PATH}/"
 
