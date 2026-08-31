@@ -699,26 +699,13 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
   })();
 
   // ════════════ DATA LAYER ════════════
-  var TASK_SEED = [
-    { label: 'Ship the FOCUS timer — NoteOS', priority: 'P1', position: 0 },
-    { label: 'Evaluate FETS aptitude papers (24)', priority: 'P1', position: 1 },
-    { label: 'Reply to two client emails', priority: 'P2', position: 2 },
-    { label: 'Push FETS portal exam module to review', priority: 'P2', position: 3 },
-    { label: 'Draft Salt & Static #58', priority: 'P3', position: 4 },
-    { label: 'Renew noteos.in domain', priority: 'P3', position: 5 }
-  ];
-  var HABIT_SEED = ['Deep Work', 'Morning Walk', 'Read 30 min', 'Daily Commit', 'No Screens After 10'];
   var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
 
   var tasksCache = [];
   async function initTasks() {
     var res = await sb.from('tasks').select('*').order('position', { ascending: true });
-    var tasks = res.data || [];
-    if (tasks.length === 0) {
-      await sb.from('tasks').insert(TASK_SEED.map(function (t) { return { user_id: user.id, label: t.label, priority: t.priority, position: t.position }; }));
-      res = await sb.from('tasks').select('*').order('position', { ascending: true }); tasks = res.data || [];
-    }
-    tasksCache = tasks; renderTasks();
+    tasksCache = res.data || [];
+    renderTasks();
   }
   function renderTasks() {
     var listEl = $('tasks-list'), sumEl = $('tasks-summary'), loopsEl = $('today-loops');
@@ -754,14 +741,10 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
   var habitsCache = [], logsByHabit = {};
   async function initHabits() {
     var res = await sb.from('habits').select('*').order('position', { ascending: true });
-    var habits = res.data || [];
-    if (habits.length === 0) {
-      await sb.from('habits').insert(HABIT_SEED.map(function (name, i) { return { user_id: user.id, name: name, position: i }; }));
-      res = await sb.from('habits').select('*').order('position', { ascending: true }); habits = res.data || [];
-    }
-    habitsCache = habits;
+    habitsCache = res.data || [];
     var logs = (await sb.from('habit_logs').select('habit_id, log_date')).data || [];
-    logsByHabit = {}; logs.forEach(function (l) { (logsByHabit[l.habit_id] = logsByHabit[l.habit_id] || new Set()).add(l.log_date); });
+    logsByHabit = {};
+    logs.forEach(function (l) { (logsByHabit[l.habit_id] = logsByHabit[l.habit_id] || new Set()).add(l.log_date); });
     renderHabits();
   }
   function streakOf(id) {
