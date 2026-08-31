@@ -32,7 +32,9 @@ async function loadReminders() {
 
 async function addReminder(title, date) {
   const sb = client(), u = currentUser();
-  const res = await sb.from('reminders').insert({ user_id: u.id, title: title, event_date: date || null }).select().single();
+  // reminders.event_date is NOT NULL — fall back to today rather than failing silently
+  const when = date || new Date().toISOString().slice(0, 10);
+  const res = await sb.from('reminders').insert({ user_id: u.id, title: title, event_date: when }).select().single();
   if (res.error) { console.error('addReminder', res.error); return; }
   await loadReminders();
 }
