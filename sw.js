@@ -1,5 +1,5 @@
 /* NoteOS / Threshold — service worker (app shell cache) */
-const CACHE = 'threshold-v1';
+const CACHE = 'threshold-v2';
 const SHELL = [
   './',
   './index.html',
@@ -41,6 +41,19 @@ self.addEventListener('fetch', (e) => {
 
   // Never cache Supabase API / auth traffic — always go to network.
   if (url.hostname.endsWith('supabase.co')) return;
+
+  // App modules: network-first so a deploy is picked up immediately,
+  // falling back to cache only when offline.
+  if (url.origin === self.location.origin && url.pathname.includes('/app/')) {
+    e.respondWith(
+      fetch(req).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        return res;
+      }).catch(() => caches.match(req))
+    );
+    return;
+  }
 
   // Same-origin assets: cache-first, then fill the cache.
   if (url.origin === self.location.origin) {
