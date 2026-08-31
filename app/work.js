@@ -1,6 +1,6 @@
 import { $, el } from './ui.js';
 import { isQuiet, iso } from './lib.js';
-import { client, currentUser, onInit, onTaskChange } from './data.js';
+import { client, currentUser, onInit, onTaskChange, refreshVentureNames } from './data.js';
 
 const STAGE_COLOR = { BUILDING: 'var(--accent)', ACTIVE: '#C9C5BC', STEADY: '#8E8A82', PAUSED: '#5A5752' };
 
@@ -43,6 +43,7 @@ async function addVenture(name) {
   const res = await sb.from('ventures').insert({ user_id: u.id, name: name, stage: 'ACTIVE', sort_order: Date.now() % 100000 }).select().single();
   if (res.error) { console.error('addVenture', res.error); return; }
   await loadWork();
+  await refreshVentureNames();
   await refreshVentureOptions();
 }
 

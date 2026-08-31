@@ -138,6 +138,13 @@ $('water-plus').addEventListener('click', function () { if (sb && user && health
 $('water-minus').addEventListener('click', function () { if (sb && user && health.water > 0) { health.water--; renderHealth(); saveHealth(); } });
 $('workout-pip').addEventListener('click', function () { if (sb && user) { health.workout = !health.workout; renderHealth(); saveHealth(); } });
 
+export async function refreshVentureNames() {
+  var vres = await sb.from('ventures').select('id, name');
+  ventureNames = {};
+  (vres.data || []).forEach(function (v) { ventureNames[v.id] = v.name; });
+  renderTasks();
+}
+
 const SECTION_INITS = [];
 export function onInit(fn) { SECTION_INITS.push(fn); }
 
