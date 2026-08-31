@@ -3,6 +3,7 @@ import { boot } from './data.js';
 import './today.js';
 import './work.js';
 import './personal.js';
+import './journal.js';
 
 startClock();
 boot();

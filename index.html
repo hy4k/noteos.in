@@ -432,7 +432,25 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
         <div><div class="sec-label">06 · Journal</div><h2 class="sec-title">Journal</h2></div>
         <div class="sec-desc">A line a day,<br>most days.</div>
       </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;flex-direction:column;gap:10px">
+        <textarea id="journal-input" placeholder="What happened today…" spellcheck="false" rows="3"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px;resize:vertical"></textarea>
+        <div style="display:flex;gap:10px">
+          <button id="journal-add" class="btn">Add entry</button>
+        </div>
+      </div>
       <div style="margin-top:18px;max-width:760px" id="journal-list"></div>
+
+      <div class="sec-header">
+        <div><h2 class="sec-title">Reflection</h2></div>
+        <div class="sec-desc">One line on today.<br>One star for tomorrow.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;flex-direction:column;gap:10px">
+        <input id="refl-one-line" placeholder="One line on today…" spellcheck="false"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="refl-tomorrow" placeholder="Tomorrow's north star…" spellcheck="false"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+      </div>
     </section>
 
   </main>
