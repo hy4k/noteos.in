@@ -171,11 +171,9 @@ $('li-go').addEventListener('click', async function () {
   liShow('Checking…');
   var r = await sb.auth.signInWithPassword({ email: email, password: pass });
   if (!r.error) { liShow('Welcome.', 'ok'); enterApp(); return; }
-  // no account yet → create one
-  var su = await sb.auth.signUp({ email: email, password: pass });
-  if (su.error) { liShow(su.error.message, 'err'); return; }
-  if (su.data.session) { liShow('Account created.', 'ok'); enterApp(); }
-  else { liShow('Account made. If asked to confirm by email, turn off "Confirm email" in Supabase, then press Enter again.', 'ok'); }
+  // Single-user app: signups are disabled, so never fall back to signUp — doing so
+  // replaced the real sign-in error with a misleading "Signups not allowed" message.
+  liShow(r.error.message, 'err');
 });
 $('li-pass').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('li-go').click(); });
 
