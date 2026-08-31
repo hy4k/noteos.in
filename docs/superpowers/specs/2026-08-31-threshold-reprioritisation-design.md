@@ -23,8 +23,16 @@ end is not.
 - **12 tables nothing touches:** `north_stars`, `priorities`, `agenda_items`,
   `ventures`, `goals`, `todos`, `journal_entries`, `daily_reflections`,
   `reminders`, `family_notes`, `credentials`, `profiles`.
-- **10 UI sections, 5 of them empty shells** — Projects, FETS, Finance, Learn and
-  Journal render a heading and a subtitle and nothing else.
+- **10 UI sections, 5 of them fed by hardcoded fabrications.** Projects, Learn,
+  Finance and Journal each have a `render*()` IIFE that injects invented content —
+  ventures that do not exist ("Salt & Static", "Archive 47"), made-up rupee
+  transactions, fictional journal entries. They are not empty; they are a mockup.
+- **`TASK_SEED` and `HABIT_SEED` write fabricated rows into the real database**
+  whenever `tasks` or `habits` returns empty. This must be removed before auth is
+  restored, or the first real login pollutes Supabase with invented data.
+- **The auth code is already complete** — `signInWithPassword` with a `signUp`
+  fallback, the owner's email prefilled, and a working hold-to-enter ring. Only
+  `boot()` was altered. Restoring auth is a deletion, not a build.
 - **CSS for the unbuilt sections already exists** — `.venture-row`, `.today-hero`,
   `.today-ns`, `.today-grid`, `.statval` and others are defined but unused. The
   app was styled for its full scope and never wired.
