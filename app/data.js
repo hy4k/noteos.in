@@ -7,6 +7,8 @@ var KEY = window.SUPABASE_ANON_KEY || '';
 var configured = KEY && KEY.indexOf('PASTE_') === -1 && !!window.supabase;
 var sb = configured ? window.supabase.createClient(SBURL, KEY) : null;
 var user = null, inited = false;
+export function client() { return sb; }
+export function currentUser() { return user; }
 
 // ════════════ DATA LAYER ════════════
 var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
@@ -132,11 +134,17 @@ $('water-plus').addEventListener('click', function () { if (sb && user && health
 $('water-minus').addEventListener('click', function () { if (sb && user && health.water > 0) { health.water--; renderHealth(); saveHealth(); } });
 $('workout-pip').addEventListener('click', function () { if (sb && user) { health.workout = !health.workout; renderHealth(); saveHealth(); } });
 
+const SECTION_INITS = [];
+export function onInit(fn) { SECTION_INITS.push(fn); }
+
 async function initData() {
   if (inited) return; inited = true;
   var u = await sb.auth.getUser(); user = u.data.user;
   $('signout-rail').style.display = 'block';
   try { await initTasks(); await initHabits(); await window.__refreshFocus(); await initHealth(); } catch (e) { console.error('initData', e); }
+  for (const fn of SECTION_INITS) {
+    try { await fn(); } catch (e) { console.error('section init', e); }
+  }
   updateScroller();
 }
 
