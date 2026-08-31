@@ -17,7 +17,7 @@ async function saveNorthStar() {
   if (!content) return;
   const payload = { user_id: u.id, content: content, date: todayStr() };
   if (nsRow) payload.id = nsRow.id;            // never send an undefined id
-  const res = await sb.from('north_stars').upsert(payload).select().single();
+  const res = await sb.from('north_stars').upsert(payload, { onConflict: 'user_id,date' }).select().single();
   if (res.data) nsRow = res.data;
 }
 
@@ -54,7 +54,7 @@ async function savePriority(rank, content, existing) {
   const sb = client(), u = currentUser();
   const payload = { user_id: u.id, rank: rank, content: content, date: todayStr(), done: existing ? existing.done : false };
   if (existing) payload.id = existing.id;      // never send an undefined id
-  const res = await sb.from('priorities').upsert(payload).select().single();
+  const res = await sb.from('priorities').upsert(payload, { onConflict: 'user_id,date,rank' }).select().single();
   if (res.data) { await loadPriorities(); }
 }
 

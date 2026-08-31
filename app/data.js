@@ -85,34 +85,6 @@ async function toggleHabit(t) {
   else { set.add(today); renderHabits(); await sb.from('habit_logs').insert({ user_id: user.id, habit_id: t.id, log_date: today }); }
 }
 
-// FOCUS
-(function () {
-  var presetMin = 50, remaining = presetMin * 60, running = false, timer = null;
-  var clock = $('focus-clock'), toggle = $('focus-toggle'), resetBtn = $('focus-reset');
-  var chips = document.querySelectorAll('#sec-TODAY .chip');
-  function fmt(s) { var m = Math.floor(s / 60), ss = s % 60; return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss; }
-  function fmtTotal(min) { var h = Math.floor(min / 60), m = min % 60; return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
-  function rc() { clock.textContent = fmt(remaining); }
-  function stop() { running = false; clearInterval(timer); timer = null; toggle.textContent = 'Start'; toggle.classList.add('primary'); }
-  function start() {
-    running = true; toggle.textContent = 'Pause'; toggle.classList.remove('primary');
-    timer = setInterval(function () { remaining--; if (remaining <= 0) { stop(); logSession(presetMin); remaining = presetMin * 60; rc(); return; } rc(); }, 1000);
-  }
-  toggle.addEventListener('click', function () { running ? stop() : start(); });
-  resetBtn.addEventListener('click', function () { stop(); remaining = presetMin * 60; rc(); });
-  chips.forEach(function (c) { c.addEventListener('click', function () { if (running) return; chips.forEach(function (x) { x.classList.remove('active'); }); c.classList.add('active'); presetMin = parseInt(c.dataset.min, 10); remaining = presetMin * 60; rc(); }); });
-  rc();
-  async function logSession(min) { if (!sb || !user) return; var label = $('focus-task').value.trim() || null; await sb.from('focus_sessions').insert({ user_id: user.id, task_label: label, minutes: min }); window.__refreshFocus(); }
-  window.__refreshFocus = async function () {
-    if (!sb || !user) return;
-    var d0 = new Date(); d0.setHours(0, 0, 0, 0);
-    var res = await sb.from('focus_sessions').select('minutes').gte('completed_at', d0.toISOString());
-    var rows = res.data || [], total = rows.reduce(function (a, b) { return a + b.minutes; }, 0);
-    $('focus-sessions').textContent = rows.length; $('focus-total').textContent = fmtTotal(total);
-    var pf = $('pulse-focus'); if (pf) pf.textContent = (total / 60).toFixed(1) + 'h';
-  };
-})();
-
 // HEALTH
 var health = { water: 0, workout: false };
 async function initHealth() {
@@ -141,7 +113,7 @@ async function initData() {
   if (inited) return; inited = true;
   var u = await sb.auth.getUser(); user = u.data.user;
   $('signout-rail').style.display = 'block';
-  try { await initTasks(); await initHabits(); await window.__refreshFocus(); await initHealth(); } catch (e) { console.error('initData', e); }
+  try { await initTasks(); await initHabits(); await initHealth(); } catch (e) { console.error('initData', e); }
   for (const fn of SECTION_INITS) {
     try { await fn(); } catch (e) { console.error('section init', e); }
   }
