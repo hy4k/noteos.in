@@ -164,7 +164,7 @@ holdbtn.addEventListener('pointercancel', holdEnd);
 function enterApp() { hideLock(); initData(); }
 
 // sign-in (first run on a device)
-if ($('li-email') && NAME) { $('li-email').value = 'midhunnr@gmail.com'; }
+if ($('li-email') && NAME) { $('li-email').value = 'mithun@noteos.in'; }
 $('li-go').addEventListener('click', async function () {
   var email = $('li-email').value.trim(), pass = $('li-pass').value;
   if (!email || !pass) return liShow('Enter email and password.', 'err');
@@ -186,13 +186,20 @@ $('ns-signout').addEventListener('click', signOut);
 
 // ════════════ BOOT ════════════
 export async function boot() {
-  // Password protection is disabled for local/demo use. Open the dashboard directly.
-  hideLock();
-  if (!sb) return;
-
+  if (!sb) {
+    paneSignin.style.display = 'block'; showLock();
+    liShow('Backend not configured. Add your Supabase anon key in supabase-config.js.', 'err');
+    $('li-email').style.display = 'none'; $('li-pass').style.display = 'none'; $('li-go').style.display = 'none';
+    return;
+  }
   var s = await sb.auth.getSession();
   if (s.data.session) {
+    hideLock();
     initData();
-    sb.auth.onAuthStateChange(function (evt) { if (evt === 'SIGNED_OUT') location.reload(); });
+  } else {
+    $('li-sub').textContent = 'Sign in to begin';
+    paneSignin.style.display = 'block';
+    showLock();
   }
+  sb.auth.onAuthStateChange(function (evt) { if (evt === 'SIGNED_OUT') location.reload(); });
 }
