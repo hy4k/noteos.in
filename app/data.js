@@ -1,5 +1,6 @@
 import { $, el, NAME, updateScroller } from './ui.js';
 import { iso, todayStr, streakFrom } from './lib.js';
+import { push as qpush, peek as qpeek, flush as qflush } from './queue.js';
 
 // ── Supabase ──
 var SBURL = window.SUPABASE_URL || '';
@@ -44,6 +45,12 @@ function renderTasks() {
     row.addEventListener('click', function () { toggleTask(t); });
     listEl.appendChild(row);
   });
+  qpeek().forEach(function (q) {
+    var row = el('div', { class: 'task-row', style: 'display:grid;grid-template-columns:18px 40px 1fr;gap:14px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)' });
+    row.innerHTML = '<div class="check"></div><div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:#5A5752">\u00b7\u00b7</div><div class="task-label" style="font-size:16px;color:#5A5752"></div>';
+    row.querySelector('.task-label').textContent = q.label;
+    listEl.appendChild(row);
+  });
   sumEl.textContent = done + ' of ' + tasksCache.length + ' closed today';
   var open = tasksCache.filter(function (t) { return !t.done; }).slice(0, 4);
   if (open.length < 4) open = open.concat(tasksCache.filter(function (t) { return t.done; }).slice(0, 4 - open.length));
@@ -59,8 +66,18 @@ async function addTask(label) {
   var pos = tasksCache.length ? Math.max.apply(null, tasksCache.map(function (t) { return t.position; })) + 1 : 0;
   var sel = $('task-venture');
   var vid = sel && sel.value ? sel.value : null;
-  var res = await sb.from('tasks').insert({ user_id: user.id, label: label, priority: 'P2', position: pos, venture_id: vid }).select().single();
-  if (res.data) { tasksCache.push(res.data); renderTasks(); notifyTaskChange(); }
+  try {
+    var res = await sb.from('tasks').insert({ user_id: user.id, label: label, priority: 'P2', position: pos, venture_id: vid }).select().single();
+    if (res.error) throw res.error;
+    if (res.data) { tasksCache.push(res.data); renderTasks(); notifyTaskChange(); }
+    return true;
+  } catch (e) {
+    // Offline, or the write was rejected: keep the capture and show it greyed.
+    console.error('addTask queued', e);
+    qpush(label);
+    renderTasks();
+    return false;
+  }
 }
 $('task-add').addEventListener('click', function () { var inp = $('task-input'); var v = inp.value.trim(); if (v && sb && user) { addTask(v); inp.value = ''; } });
 $('task-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('task-add').click(); });
@@ -129,6 +146,7 @@ async function initData() {
   var u = await sb.auth.getUser(); user = u.data.user;
   $('signout-rail').style.display = 'block';
   try { await initTasks(); await initHabits(); await initHealth(); } catch (e) { console.error('initData', e); }
+  try { await qflush(addTask); } catch (e) { console.error('queue flush', e); }
   for (const fn of SECTION_INITS) {
     try { await fn(); } catch (e) { console.error('section init', e); }
   }

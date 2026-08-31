@@ -47,3 +47,18 @@ export function dueSoon(rows, today = new Date()) {
     .filter((r) => r.days <= DUE_WINDOW_DAYS)
     .sort((a, b) => a.days - b.days);
 }
+
+export const QUEUE_KEY = 'threshold.queue.tasks';
+
+// Append an item, keeping the queue bounded and free of exact duplicates.
+export function enqueue(list, item, max = 200) {
+  const next = list.filter(function (x) { return x.label !== item.label; });
+  next.push(item);
+  return next.slice(-max);
+}
+
+// Items old enough to be worth retrying are all of them; kept as a seam
+// so retry policy can change without touching storage code.
+export function drainable(list) {
+  return list.filter(function (x) { return x && typeof x.label === 'string' && x.label.length > 0; });
+}

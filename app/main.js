@@ -5,6 +5,7 @@ import './work.js';
 import './personal.js';
 import './journal.js';
 import './finance.js';
+import './queue.js';
 
 startClock();
 boot();

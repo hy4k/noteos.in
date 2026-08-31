@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { iso, streakFrom, isQuiet, dueSoon } from '../app/lib.js';
+import { iso, streakFrom, isQuiet, dueSoon, enqueue, drainable } from '../app/lib.js';
 
 test('iso formats a date as YYYY-MM-DD in local time', () => {
   assert.equal(iso(new Date(2026, 7, 31)), '2026-08-31');
@@ -49,4 +49,26 @@ test('dueSoon selects items inside the window and flags the urgent ones', () => 
   assert.equal(out[0].urgent, true);
   assert.equal(out[1].urgent, true);
   assert.equal(out[2].urgent, false);
+});
+test('enqueue appends and de-duplicates by label', () => {
+  const a = enqueue([], { label: 'one' });
+  assert.deepEqual(a.map(x => x.label), ['one']);
+  const b = enqueue(a, { label: 'two' });
+  assert.deepEqual(b.map(x => x.label), ['one', 'two']);
+  const c = enqueue(b, { label: 'one' });
+  assert.deepEqual(c.map(x => x.label), ['two', 'one']);
+});
+
+test('enqueue keeps the queue bounded', () => {
+  let list = [];
+  for (let i = 0; i < 10; i++) list = enqueue(list, { label: 'x' + i }, 5);
+  assert.equal(list.length, 5);
+  assert.equal(list[0].label, 'x5');
+});
+
+test('drainable skips malformed entries', () => {
+  assert.deepEqual(
+    drainable([{ label: 'ok' }, null, { label: '' }, { nope: 1 }]).map(x => x.label),
+    ['ok']
+  );
 });
