@@ -391,6 +391,29 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
           </div>
         </div>
       </div>
+      <div class="sec-header">
+        <div><h2 class="sec-title">Reminders</h2></div>
+        <div class="sec-desc">Dates that matter.<br>Before they arrive.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="reminder-input" placeholder="What to remember…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="reminder-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="reminder-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="reminders-list"></div>
+
+      <div class="sec-header">
+        <div><h2 class="sec-title">Family</h2></div>
+        <div class="sec-desc">The people, not the tasks.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="family-input" placeholder="A note about someone…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="family-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="family-list"></div>
     </section>
 
     <!-- ============ 05 FINANCE ============ -->
