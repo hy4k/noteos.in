@@ -4,6 +4,7 @@ import './today.js';
 import './work.js';
 import './personal.js';
 import './journal.js';
+import './finance.js';
 
 startClock();
 boot();

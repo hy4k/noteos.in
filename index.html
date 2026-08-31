@@ -422,7 +422,16 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
         <div><div class="sec-label">05 · Finance</div><h2 class="sec-title">Finance</h2></div>
         <div class="sec-desc">Runway, not score.</div>
       </div>
-      <div class="mono-cap" style="margin-top:40px;font-size:11px;">Recent Movement</div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px;flex-wrap:wrap">
+        <input id="bill-name" placeholder="What's due…" spellcheck="false"
+          style="flex:1;min-width:200px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="bill-amount" placeholder="₹" inputmode="decimal"
+          style="width:120px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="bill-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="bill-add" class="btn">Add</button>
+      </div>
+      <div class="mono-cap" style="margin-top:40px;font-size:11px;">Due &amp; Renewals</div>
       <div style="margin-top:10px" id="finance-list"></div>
     </section>
 
