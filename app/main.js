@@ -1,6 +1,7 @@
 import { startClock, updateScroller } from './ui.js';
 import { boot } from './data.js';
 import './today.js';
+import './work.js';
 
 startClock();
 boot();

@@ -10,13 +10,21 @@ var user = null, inited = false;
 export function client() { return sb; }
 export function currentUser() { return user; }
 
+const TASK_LISTENERS = [];
+export function onTaskChange(fn) { TASK_LISTENERS.push(fn); }
+function notifyTaskChange() { TASK_LISTENERS.forEach(function (fn) { try { fn(); } catch (e) { console.error('task listener', e); } }); }
+
 // ════════════ DATA LAYER ════════════
 var pColor = { P1: 'var(--accent)', P2: '#8E8A82', P3: '#5A5752' };
 
 var tasksCache = [];
+var ventureNames = {};
 async function initTasks() {
   var res = await sb.from('tasks').select('*').order('position', { ascending: true });
   tasksCache = res.data || [];
+  var vres = await sb.from('ventures').select('id, name');
+  ventureNames = {};
+  (vres.data || []).forEach(function (v) { ventureNames[v.id] = v.name; });
   renderTasks();
 }
 function renderTasks() {
@@ -28,6 +36,11 @@ function renderTasks() {
     var row = el('div', { class: 'task-row' + (t.done ? ' done' : ''), style: 'display:grid;grid-template-columns:18px 40px 1fr;gap:14px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)' });
     row.innerHTML = '<div class="check"></div><div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:' + (pColor[t.priority] || '#8E8A82') + '">' + t.priority + '</div><div class="task-label" style="font-size:16px;color:#C9C5BC"></div>';
     row.querySelector('.task-label').textContent = t.label;
+    if (t.venture_id && ventureNames[t.venture_id]) {
+      var vtag = el('span', { style: 'font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#5A5752;margin-left:10px' });
+      vtag.textContent = ventureNames[t.venture_id];
+      row.querySelector('.task-label').appendChild(vtag);
+    }
     row.addEventListener('click', function () { toggleTask(t); });
     listEl.appendChild(row);
   });
@@ -41,11 +54,13 @@ function renderTasks() {
   });
   var pd = $('pulse-done'); if (pd) pd.textContent = done;
 }
-async function toggleTask(t) { t.done = !t.done; renderTasks(); await sb.from('tasks').update({ done: t.done }).eq('id', t.id); }
+async function toggleTask(t) { t.done = !t.done; renderTasks(); await sb.from('tasks').update({ done: t.done }).eq('id', t.id); notifyTaskChange(); }
 async function addTask(label) {
   var pos = tasksCache.length ? Math.max.apply(null, tasksCache.map(function (t) { return t.position; })) + 1 : 0;
-  var res = await sb.from('tasks').insert({ user_id: user.id, label: label, priority: 'P2', position: pos }).select().single();
-  if (res.data) { tasksCache.push(res.data); renderTasks(); }
+  var sel = $('task-venture');
+  var vid = sel && sel.value ? sel.value : null;
+  var res = await sb.from('tasks').insert({ user_id: user.id, label: label, priority: 'P2', position: pos, venture_id: vid }).select().single();
+  if (res.data) { tasksCache.push(res.data); renderTasks(); notifyTaskChange(); }
 }
 $('task-add').addEventListener('click', function () { var inp = $('task-input'); var v = inp.value.trim(); if (v && sb && user) { addTask(v); inp.value = ''; } });
 $('task-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('task-add').click(); });

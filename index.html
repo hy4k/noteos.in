@@ -332,6 +332,11 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
         <div><div class="sec-label">02 · Work</div><h2 class="sec-title">Work</h2></div>
         <div class="sec-desc">What I'm building<br>and what's gone quiet.</div>
       </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="venture-input" placeholder="Add a project or venture…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="venture-add" class="btn">Add</button>
+      </div>
       <div style="margin-top:8px" id="projects-list"></div>
     </section>
 
@@ -344,6 +349,9 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
       <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
         <input id="task-input" placeholder="Add a task…" spellcheck="false"
           style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <select id="task-venture" style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+          <option value="">Personal</option>
+        </select>
         <button id="task-add" class="btn">Add</button>
       </div>
       <div style="margin-top:18px;max-width:760px" id="tasks-list"></div>
