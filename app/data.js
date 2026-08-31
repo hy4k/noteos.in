@@ -87,7 +87,7 @@ async function toggleHabit(t) {
 (function () {
   var presetMin = 50, remaining = presetMin * 60, running = false, timer = null;
   var clock = $('focus-clock'), toggle = $('focus-toggle'), resetBtn = $('focus-reset');
-  var chips = document.querySelectorAll('#sec-FOCUS .chip');
+  var chips = document.querySelectorAll('#sec-TODAY .chip');
   function fmt(s) { var m = Math.floor(s / 60), ss = s % 60; return (m < 10 ? '0' : '') + m + ':' + (ss < 10 ? '0' : '') + ss; }
   function fmtTotal(min) { var h = Math.floor(min / 60), m = min % 60; return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
   function rc() { clock.textContent = fmt(remaining); }

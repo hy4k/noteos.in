@@ -294,7 +294,6 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
     <!-- ============ 01 TODAY ============ -->
     <section class="section active" id="sec-TODAY" style="padding:56px 72px 64px 64px;display:flex;flex-direction:column;">
       <div id="today-date" class="mono-cap" style="font-size:12px;letter-spacing:2.5px;"></div>
-      <div class="mono-cap" style="margin-top:11px;font-size:12px;letter-spacing:2.5px;">CALICUT — 28°C, HUMID</div>
 
       <div class="today-hero" style="margin-top:108px">
         <h1 id="today-greeting" style="font-family:'Oswald',sans-serif;font-weight:700;font-size:104px;line-height:.9;letter-spacing:-1.5px;text-transform:uppercase;margin:0;color:#F4F1EA"></h1>
@@ -302,19 +301,14 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
 
       <div class="today-ns" style="margin-top:80px;max-width:620px">
         <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Today's North Star</div>
-        <p style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400">Ship the FOCUS timer in NoteOS, then clear today's FETS evaluations. Nothing else moves until those two are done.</p>
+        <p id="today-ns-text" style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400"></p>
         <div style="margin-top:24px;width:100%;height:1px;background:rgba(244,241,234,.1)"></div>
       </div>
 
       <div class="today-grid" style="margin-top:auto;padding-top:64px;display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:0;border-top:1px solid rgba(244,241,234,.09)">
         <div style="padding:26px 36px 4px 0;border-right:1px solid var(--line)">
           <div class="mono-cap" style="font-size:11px;">Blocks</div>
-          <div style="margin-top:18px;display:flex;flex-direction:column;gap:13px">
-            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">08:00</div><div style="font-size:14px;color:#C9C5BC">Beach road + coffee</div></div>
-            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">09:30</div><div style="font-size:14px;color:#C9C5BC">Deep work — FOCUS timer</div></div>
-            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">11:00</div><div style="font-size:14px;color:#C9C5BC">FETS — Aptitude mock, Batch C</div></div>
-            <div style="display:flex;gap:16px;align-items:baseline"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);min-width:46px">17:00</div><div style="font-size:14px;color:#C9C5BC">Walk, then journal</div></div>
-          </div>
+          <div id="today-blocks" style="margin-top:18px;display:flex;flex-direction:column;gap:13px"></div>
         </div>
         <div style="padding:26px 36px 4px;border-right:1px solid var(--line)">
           <div class="mono-cap" style="font-size:11px;">Open Loops</div>
@@ -329,17 +323,15 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ============ 02 FOCUS ============ -->
-    <section class="section" id="sec-FOCUS" style="padding:54px 72px 80px 64px;">
+      <!-- Focus (folded in from the former FOCUS section) -->
       <div class="sec-header">
-        <div><div class="sec-label">02 · Focus</div><h2 class="sec-title">Focus</h2></div>
+        <div><h2 class="sec-title">Focus</h2></div>
         <div class="sec-desc">One task. One timer.<br>Nothing else.</div>
       </div>
       <div style="margin-top:48px;display:flex;flex-direction:column;align-items:center;text-align:center">
         <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Now working on</div>
-        <input id="focus-task" value="Ship the FOCUS timer — NoteOS" spellcheck="false"
+        <input id="focus-task" value="" spellcheck="false"
           style="margin-top:14px;background:transparent;border:none;outline:none;text-align:center;font-family:'Oswald',sans-serif;font-weight:500;font-size:28px;text-transform:uppercase;letter-spacing:.4px;color:#E6E2DA;width:min(640px,86vw)">
         <div id="focus-clock" style="font-family:'Oswald',sans-serif;font-weight:700;font-size:160px;line-height:1;letter-spacing:-3px;color:#F4F1EA;margin:30px 0 8px;font-variant-numeric:tabular-nums">50:00</div>
         <div style="display:flex;gap:10px;margin-bottom:34px;flex-wrap:wrap;justify-content:center">
@@ -358,59 +350,19 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
       </div>
     </section>
 
-    <!-- ============ 03 PROJECTS ============ -->
-    <section class="section" id="sec-PROJECTS" style="padding:54px 72px 80px 64px">
+    <!-- ============ 02 WORK ============ -->
+    <section class="section" id="sec-WORK" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div><div class="sec-label">03 · Projects</div><h2 class="sec-title">Projects</h2></div>
+        <div><div class="sec-label">02 · Work</div><h2 class="sec-title">Work</h2></div>
         <div class="sec-desc">What I'm building<br>and what's gone quiet.</div>
       </div>
       <div style="margin-top:8px" id="projects-list"></div>
     </section>
 
-    <!-- ============ 04 FETS ============ -->
-    <section class="section" id="sec-FETS" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div><div class="sec-label">04 · FETS</div><h2 class="sec-title">FETS</h2></div>
-        <div class="sec-desc">Testing &amp; educational<br>services — the company.</div>
-      </div>
-      <div class="grid-3" style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:0">
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Active Students</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">128</div></div>
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Live Batches</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">6</div></div>
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">This Month</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:var(--accent);margin-top:10px">+ ₹ 1.4L</div></div>
-      </div>
-      <div class="grid-2" style="margin-top:44px;display:grid;grid-template-columns:1.2fr 1fr;gap:56px">
-        <div>
-          <div class="mono-cap" style="font-size:11px;">Today's Sessions</div>
-          <div style="margin-top:14px">
-            <div style="display:grid;grid-template-columns:84px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">09:30</div><div style="font-size:15px;color:#C9C5BC">Aptitude Mock — Batch C</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">42 seats</div></div>
-            <div style="display:grid;grid-template-columns:84px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">11:30</div><div style="font-size:15px;color:#C9C5BC">Spoken English — Eve Batch</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">live</div></div>
-            <div style="display:grid;grid-template-columns:84px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">14:00</div><div style="font-size:15px;color:#C9C5BC">Paper evaluation block</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">24 left</div></div>
-            <div style="display:grid;grid-template-columns:84px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">16:30</div><div style="font-size:15px;color:#C9C5BC">Corporate testing — TCS prep</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5A5752">on-site</div></div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:26px">
-          <div>
-            <div class="mono-cap" style="font-size:11px;">Needs Attention</div>
-            <div style="margin-top:14px;display:flex;flex-direction:column;gap:1px;background:rgba(244,241,234,.07);border:1px solid rgba(244,241,234,.07)">
-              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Papers to evaluate</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">24</div></div>
-              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Fees pending</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">₹ 38K</div></div>
-              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">New enrolment leads</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">5</div></div>
-              <div style="background:#0B0B0C;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="font-size:15px;color:#E6E2DA">Next exam · 28 Jun</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#8E8A82">6 days</div></div>
-            </div>
-          </div>
-          <div style="border:1px solid rgba(244,241,234,.09);padding:24px">
-            <div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Top batch this month</div>
-            <div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:28px;text-transform:uppercase;color:#E6E2DA;margin-top:8px;line-height:1.1">Bank Prep — Batch A</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752;margin-top:8px">38 students · 94% attendance</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ 05 TASKS ============ -->
+    <!-- ============ 03 TASKS ============ -->
     <section class="section" id="sec-TASKS" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div><div class="sec-label">05 · Tasks</div><h2 class="sec-title">Tasks</h2></div>
+        <div><div class="sec-label">03 · Tasks</div><h2 class="sec-title">Tasks</h2></div>
         <div class="sec-desc">Open loops.<br>Close them.</div>
       </div>
       <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
@@ -422,19 +374,17 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
       <div id="tasks-summary" class="mono-cap" style="margin-top:24px;font-size:11px;"></div>
     </section>
 
-    <!-- ============ 06 HABITS ============ -->
-    <section class="section" id="sec-HABITS" style="padding:54px 72px 80px 64px">
+    <!-- ============ 04 PERSONAL ============ -->
+    <section class="section" id="sec-PERSONAL" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div><div class="sec-label">06 · Habits</div><h2 class="sec-title">Habits</h2></div>
+        <div><div class="sec-label">04 · Personal</div><h2 class="sec-title">Personal</h2></div>
         <div class="sec-desc">What holds steady<br>when everything moves.</div>
       </div>
       <div style="margin-top:30px;max-width:680px" id="habits-list"></div>
-    </section>
 
-    <!-- ============ 07 HEALTH ============ -->
-    <section class="section" id="sec-HEALTH" style="padding:54px 72px 80px 64px">
+      <!-- Health (folded in from the former HEALTH section) -->
       <div class="sec-header">
-        <div><div class="sec-label">07 · Health</div><h2 class="sec-title">Health</h2></div>
+        <div><h2 class="sec-title">Health</h2></div>
         <div class="sec-desc">The body runs<br>the whole thing.</div>
       </div>
       <div class="grid-2" style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:56px;max-width:900px">
@@ -455,46 +405,24 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
               <div id="workout-label" style="font-size:17px;color:#C9C5BC">Not done yet</div>
             </div>
           </div>
-          <div>
-            <div class="mono-cap" style="font-size:11px;">Last night's sleep</div>
-            <div style="margin-top:14px;display:flex;align-items:baseline;gap:16px"><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA">7h 20m</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">slept 23:40 · woke 07:00</div></div>
-          </div>
-          <div>
-            <div class="mono-cap" style="font-size:11px;">Steps</div>
-            <div style="margin-top:14px;display:flex;align-items:baseline;gap:16px"><div style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA">6,240</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#5A5752">goal 8,000</div></div>
-          </div>
         </div>
       </div>
     </section>
 
-    <!-- ============ 08 LEARN ============ -->
-    <section class="section" id="sec-LEARN" style="padding:54px 72px 80px 64px">
-      <div class="sec-header">
-        <div><div class="sec-label">08 · Learn</div><h2 class="sec-title">Learn</h2></div>
-        <div class="sec-desc">Sharpening the axe,<br>a little each day.</div>
-      </div>
-      <div style="margin-top:30px" id="learn-list"></div>
-    </section>
-
-    <!-- ============ 09 FINANCE ============ -->
+    <!-- ============ 05 FINANCE ============ -->
     <section class="section" id="sec-FINANCE" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div><div class="sec-label">09 · Finance</div><h2 class="sec-title">Finance</h2></div>
+        <div><div class="sec-label">05 · Finance</div><h2 class="sec-title">Finance</h2></div>
         <div class="sec-desc">Runway, not score.</div>
-      </div>
-      <div class="grid-3" style="margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:0">
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Net Position</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">₹ 18.4L</div></div>
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">Runway</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:#F4F1EA;margin-top:10px">14 mo</div></div>
-        <div style="padding:6px 32px 6px 0"><div class="mono-cap" style="font-size:11px;letter-spacing:2px;">This Month</div><div class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;letter-spacing:-.5px;color:var(--accent);margin-top:10px">+ ₹ 1.4L</div></div>
       </div>
       <div class="mono-cap" style="margin-top:40px;font-size:11px;">Recent Movement</div>
       <div style="margin-top:10px" id="finance-list"></div>
     </section>
 
-    <!-- ============ 10 JOURNAL ============ -->
+    <!-- ============ 06 JOURNAL ============ -->
     <section class="section" id="sec-JOURNAL" style="padding:54px 72px 80px 64px">
       <div class="sec-header">
-        <div><div class="sec-label">10 · Journal</div><h2 class="sec-title">Journal</h2></div>
+        <div><div class="sec-label">06 · Journal</div><h2 class="sec-title">Journal</h2></div>
         <div class="sec-desc">A line a day,<br>most days.</div>
       </div>
       <div style="margin-top:18px;max-width:760px" id="journal-list"></div>
