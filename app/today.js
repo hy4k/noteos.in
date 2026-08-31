@@ -1,6 +1,8 @@
 import { $, el } from './ui.js';
 import { todayStr } from './lib.js';
 import { client, currentUser, onInit } from './data.js';
+import { upcomingBills } from './finance.js';
+import { upcomingReminders } from './personal.js';
 
 var nsRow = null, priCache = [];
 
@@ -81,11 +83,35 @@ async function loadAgenda() {
   });
 }
 
+// Bills and reminders coming due, merged and soonest first. Each source is
+// guarded so a failure in one does not blank the other.
+function renderDue() {
+  const host = $('today-due');
+  if (!host) return;
+  host.innerHTML = '';
+  let rows = [];
+  try { rows = rows.concat(upcomingBills()); } catch (e) { console.error('due bills', e); }
+  try { rows = rows.concat(upcomingReminders()); } catch (e) { console.error('due reminders', e); }
+  rows.sort(function (a, b) { return a.days - b.days; });
+  rows.slice(0, 5).forEach(function (r) {
+    const when = r.days < 0 ? Math.abs(r.days) + 'D LATE' : r.days === 0 ? 'TODAY' : r.days + 'D';
+    const color = r.urgent ? '#E8705B' : '#C9C5BC';
+    const d = el('div', { style: 'display:flex;gap:13px;align-items:baseline' });
+    d.innerHTML =
+      '<div class="due-when" style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:' + color + ';flex:none;min-width:46px"></div>' +
+      '<div class="due-name" style="font-size:14px;color:' + color + '"></div>';
+    d.querySelector('.due-when').textContent = when;
+    d.querySelector('.due-name').textContent = r.name;
+    host.appendChild(d);
+  });
+}
+
 async function initToday() {
   $('today-ns-text').addEventListener('blur', saveNorthStar);
   await loadNorthStar();
   await loadPriorities();
   await loadAgenda();
+  renderDue();
 }
 
 onInit(initToday);
