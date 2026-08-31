@@ -697,3 +697,50 @@ Wiring the twelve unused tables into the six sections: Today (`north_stars`, `pr
 | Module split changes behaviour silently | Task 6 moves code verbatim; Task 8 Step 5 checks each behaviour by hand |
 | Nav rename leaves orphaned ids | Task 7 Step 4 greps for every old id |
 | Fabricated rows already written | Task 8 Step 6 counts rows after first real login |
+
+---
+
+## Execution record (2026-08-31)
+
+Phase 1 shipped. Deviations from the plan as written, all deliberate:
+
+- **Task 7 scope expanded.** The owner chose to strip every hardcoded fabrication
+  now rather than leave it for Phase 2. Beyond the nav consolidation this removed:
+  the four `render*` IIFEs, the FETS statistics and session list, Todays north-star
+
+---
+
+## Execution record (2026-08-31)
+
+Phase 1 shipped. Deviations from the plan as written, all deliberate:
+
+- **Task 7 scope expanded.** The owner chose to strip every hardcoded fabrication
+  now rather than leave it for Phase 2. Beyond the nav consolidation this removed:
+  the four `render*` IIFEs, the FETS statistics and session list, Today's north-star
+  sentence and agenda blocks, the fake weather line, the Finance stat trio
+  (Net Position, Runway, This Month), the Health sleep and steps figures, and
+  the prefilled `#focus-task` value. Unwired areas are now genuinely empty, with
+  `#today-ns-text`, `#today-blocks`, `#projects-list`, `#finance-list` and
+  `#journal-list` left as Phase 2 mount points.
+- **Task 6 import line was wrong in the plan.** `app/data.js` also needs `NAME` and
+  `updateScroller` from `./ui.js`; without them it throws at runtime.
+- **`node --test test/` does not work** on this box (Node v22.22.1) — a directory
+  argument fails. Use bare `node --test`.
+- **`app/*.js` are LF**, while `index.html` remains CRLF. Edits must match per file.
+- **Task 3 used a new account** (`mithun@noteos.in`); the email prefill was updated
+  from the old address.
+- **`#sec-FOCUS .chip` selector** had to be repointed to `#sec-TODAY .chip` when
+  Focus folded into Today, or the timer presets silently stop working.
+
+Commits: `e92589e` baseline, `929f36d` seeds, `2d78b90` lib+tests, `f9c468a` sw,
+`3d152b8` module split, `c119152` nav+strip, `efc41b7` auth. All pushed.
+
+Verified after deploy: HTTP 200, all four modules served, `threshold-v2` live,
+zero fabrications in the served HTML, and all five real tables still at 0 rows.
+
+## Outstanding
+
+- Password `123456` is weak and is the sole credential for a publicly reachable
+  app. Change it. Note that enabling Supabase leaked-password protection will
+  reject it outright.
+- Phase 2: wire the twelve unused tables, add the offline quick-capture queue.
