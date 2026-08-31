@@ -293,7 +293,7 @@ test('dueSoon selects items inside the window and flags the urgent ones', () => 
 - [ ] **Step 2: Run the test to verify it fails**
 
 ```bash
-cd /opt/apps/noteos && node --test test/
+cd /opt/apps/noteos && node --test
 ```
 
 Expected: FAIL — `Cannot find module '../app/lib.js'`.
@@ -355,7 +355,7 @@ export function dueSoon(rows, today = new Date()) {
 - [ ] **Step 4: Run the tests to verify they pass**
 
 ```bash
-cd /opt/apps/noteos && node --test test/
+cd /opt/apps/noteos && node --test
 ```
 
 Expected: PASS — 7 tests, 0 failures.
@@ -550,7 +550,7 @@ Leave lines 21–22 (the supabase-js CDN tag and `supabase-config.js`) exactly a
 cd /opt/apps/noteos
 grep -c "type=\"module\"" index.html
 wc -l index.html app/*.js
-node --test test/
+node --test
 ```
 
 Expected: one module tag; `index.html` around 545 lines; tests still pass.
@@ -628,7 +628,7 @@ Health into Personal, FETS and Projects into Work; Learn is removed."
 - [ ] **Step 1: Run the tests one final time**
 
 ```bash
-cd /opt/apps/noteos && node --test test/
+cd /opt/apps/noteos && node --test
 ```
 
 Expected: PASS.
