@@ -895,16 +895,15 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
 
   // ════════════ BOOT ════════════
   async function boot() {
-    if (!sb) {
-      paneSignin.style.display = 'block'; showLock();
-      liShow('Backend not configured. Add your Supabase anon key in supabase-config.js.', 'err');
-      $('li-email').style.display = 'none'; $('li-pass').style.display = 'none'; $('li-go').style.display = 'none';
-      return;
-    }
+    // Password protection is disabled for local/demo use. Open the dashboard directly.
+    hideLock();
+    if (!sb) return;
+
     var s = await sb.auth.getSession();
-    if (s.data.session) { paneHold.style.display = 'block'; showLock(); }       // returning → hold to enter
-    else { $('li-sub').textContent = 'Set a password to begin'; paneSignin.style.display = 'block'; showLock(); }  // first run
-    sb.auth.onAuthStateChange(function (evt, session) { if (evt === 'SIGNED_OUT') location.reload(); });
+    if (s.data.session) {
+      initData();
+      sb.auth.onAuthStateChange(function (evt) { if (evt === 'SIGNED_OUT') location.reload(); });
+    }
   }
   boot();
 
