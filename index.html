@@ -424,7 +424,45 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
         <div><div class="sec-label">05 · Finance</div><h2 class="sec-title">Finance</h2></div>
         <div class="sec-desc">Runway, not score.</div>
       </div>
-      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px;flex-wrap:wrap">
+      <!-- capture -->
+      <div style="margin-top:26px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;gap:8px">
+          <button class="chip active" id="txn-kind-expense" data-kind="expense">SPENT</button>
+          <button class="chip" id="txn-kind-income" data-kind="income">EARNED</button>
+        </div>
+        <input id="txn-amount" placeholder="₹ amount" inputmode="decimal"
+          style="width:140px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <select id="txn-category"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px"></select>
+        <input id="txn-note" placeholder="note (optional)" spellcheck="false"
+          style="flex:1;min-width:160px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="txn-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="txn-add" class="btn primary">Add</button>
+      </div>
+
+      <!-- this month -->
+      <div class="grid-3" style="margin-top:46px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:900px">
+        <div><div class="mono-cap" style="font-size:10px;">In this month</div><div id="fin-income" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:var(--accent);margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Out this month</div><div id="fin-expense" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Net</div><div id="fin-net" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Runway</div><div id="fin-runway" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">—</div></div>
+      </div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">What This Says</div>
+      <div id="fin-insights" style="margin-top:14px;max-width:760px;display:flex;flex-direction:column;gap:11px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Where It Goes</div>
+      <div id="fin-categories" style="margin-top:16px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Last Six Months</div>
+      <div id="fin-trend" style="margin-top:16px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Recent</div>
+      <div id="fin-recent" style="margin-top:10px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Due &amp; Renewals</div>
+      <div style="margin-top:16px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap">
         <input id="bill-name" placeholder="What's due…" spellcheck="false"
           style="flex:1;min-width:200px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
         <input id="bill-amount" placeholder="₹" inputmode="decimal"
@@ -433,8 +471,16 @@ input { font-size: 16px; } /* prevents iOS zoom-on-focus */
           style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
         <button id="bill-add" class="btn">Add</button>
       </div>
-      <div class="mono-cap" style="margin-top:40px;font-size:11px;">Due &amp; Renewals</div>
       <div style="margin-top:10px" id="finance-list"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Settings</div>
+      <div style="margin-top:16px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="fin-cash" placeholder="Cash on hand ₹" inputmode="decimal"
+          style="width:200px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="fin-tax" placeholder="Tax set-aside %" inputmode="decimal"
+          style="width:180px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="fin-save-settings" class="btn">Save</button>
+      </div>
     </section>
 
     <!-- ============ 06 JOURNAL ============ -->
