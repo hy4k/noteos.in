@@ -1,25 +1,60 @@
-# CODING AGENTS: READ THIS FIRST
+# NoteOS — Threshold
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+A personal command suite for daily life, dev work, and running **FETS**
+(testing & educational services). Single-page app: a vertical rail of ten
+sections — Today, Focus, Projects, FETS, Tasks, Habits, Health, Learn,
+Finance, Journal — with a Supabase backend syncing the interactive bits
+across devices.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+```
+.
+├── index.html            # the whole front-end (vanilla JS, no build step)
+├── supabase-config.js    # SUPABASE_URL + anon key (anon key is public-safe)
+├── supabase/schema.sql   # tables + Row-Level Security — run once
+├── deploy/               # Hostinger VPS deploy script + nginx config
+├── chats/                # original Claude Design transcript (handoff history)
+└── project/              # original design prototype (handoff history)
+```
 
-## What you should do — IMPORTANT
+## What syncs to Supabase
+| Section | Persisted |
+|---------|-----------|
+| **Focus** | completed deep-work sessions (count + minutes per day) |
+| **Tasks** | your tasks, priority, done state, add new |
+| **Habits** | per-day completion; streaks computed from history |
+| **Health** | water glasses + workout toggle, per day |
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+Projects / FETS / Learn / Finance / Journal are presentation content for now,
+ready to be wired to their own tables later.
 
-**Read `project/Threshold.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Setup
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+### 1. Database
+Open **Supabase Dashboard → SQL Editor**, paste `supabase/schema.sql`, run it.
+This creates the tables and Row-Level Security so each signed-in user only
+sees their own data.
 
-## About the design files
+In **Authentication → Providers → Email**, enable email sign-in. For a smooth
+single-user experience you may turn **off** "Confirm email" (Authentication →
+Settings) so you can sign in immediately after creating your account.
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+### 2. Front-end key
+In `supabase-config.js`, replace `PASTE_YOUR_SUPABASE_ANON_KEY_HERE` with your
+project's **anon public** key (Project Settings → API). The anon key is safe to
+ship in a static site — RLS is what protects the data. Never put the
+`service_role` key here.
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+Open `index.html` locally (or serve it) — you'll get a sign-in screen, create
+an account, and the app seeds default tasks/habits on first login.
 
-## Bundle contents
+### 3. Deploy to the Hostinger VPS
+```bash
+cp deploy/.env.example deploy/.env     # fill in VPS host/user/key/path
+./deploy/deploy.sh --setup-nginx       # one time: install nginx server block
+./deploy/deploy.sh                     # deploy / redeploy the static files
+```
+For HTTPS, the setup step prints the `certbot` command to run on the server.
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Noteos design enhancement` project files (HTML prototypes, assets, components)
+## Theme
+One accent colour drives everything — change `--accent` in the `:root` block of
+`index.html` to re-skin the whole suite.

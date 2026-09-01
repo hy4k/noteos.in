@@ -1,0 +1,7 @@
+# local deploy secrets
+deploy/.env
+
+# editor / OS noise
+.DS_Store
+*.log
+node_modules/
