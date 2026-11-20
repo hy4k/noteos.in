@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.noteos.rule=Host(`noteos.in`)
+      - traefik.http.routers.noteos.entrypoints=websecure
+      - traefik.http.routers.noteos.tls=true
+      - traefik.http.routers.noteos.tls.certresolver=letsencrypt
+      - traefik.http.services.noteos.loadbalancer.server.port=80
+networks:
+  proxy:
+    external: true

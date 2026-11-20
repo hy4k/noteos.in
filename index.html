@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Threshold — Command Suite</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B0B0C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Threshold">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; background: #0B0B0C; -webkit-text-size-adjust: 100%; }
+:root {
+  --accent: #F5C518;
+  --line: rgba(244,241,234,.07);
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+::selection { background: #F5C518; color: #0B0B0C; }
+
+#app {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  background: #0B0B0C;
+  color: #F4F1EA;
+  font-family: 'Hanken Grotesk', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Orb ── */
+#orb { position: absolute; right: -190px; top: 50%; transform: translateY(-50%);
+  width: 460px; height: 460px; border-radius: 50%; border: 1px solid rgba(244,241,234,.055);
+  pointer-events: none; z-index: 0; }
+#orb-inner { position: absolute; inset: 0; }
+#orb-dot { position: absolute; top: -5px; left: 50%; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--accent); transform: translateX(-50%); box-shadow: 0 0 16px rgba(245,197,24,.55); }
+#orb-ring { position: absolute; inset: 78px; border-radius: 50%; border: 1px solid rgba(244,241,234,.04); }
+
+/* ── Rail (desktop) ── */
+#rail { width: 74px; flex: none; height: 100%; border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: center; padding: 22px 0 20px; gap: 16px;
+  position: relative; z-index: 5; background: #0B0B0C; }
+#rail-title { writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Oswald', sans-serif;
+  font-weight: 700; font-size: 15px; letter-spacing: 4px; color: #F4F1EA; text-transform: uppercase; }
+#rail-divider { width: 16px; height: 1px; background: rgba(244,241,234,.16); flex: none; }
+#rail-nav { display: flex; flex-direction: column; gap: 9px; align-items: center; flex: 1; min-height: 0;
+  overflow-y: auto; scrollbar-width: none; }
+#rail-nav::-webkit-scrollbar { display: none; }
+.nav-item { writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; color: #F4F1EA;
+  opacity: 0.4; transition: opacity .22s, color .22s; padding: 3px 4px; user-select: none; flex: none; }
+.nav-item:hover { opacity: 1; }
+.nav-item.active { color: var(--accent); opacity: 1; font-weight: 500; }
+#rail-pip { width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 10px rgba(245,197,24,.5); flex: none; }
+#signout-rail { background: transparent; border: 1px solid rgba(244,241,234,.18); color: #8E8A82;
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1; flex: none;
+  transition: all .18s; display: none; }
+#signout-rail:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Main ── */
+#main { flex: 1; height: 100%; overflow-y: auto; position: relative; z-index: 1;
+  -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+#main::-webkit-scrollbar { width: 9px; }
+#main::-webkit-scrollbar-thumb { background: rgba(244,241,234,.12); }
+#main::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Mobile top bar ── */
+#mbar { display: none; }
+
+/* ── Section base ── */
+.section { display: none; min-height: 100%; }
+.section.active { display: block; }
+
+/* ── Header rhythm ── */
+.sec-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+  padding-bottom: 24px; border-bottom: 1px solid rgba(244,241,234,.09); }
+.sec-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px;
+  text-transform: uppercase; color: #6A675F; }
+.sec-title { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 62px; line-height: 1;
+  text-transform: uppercase; margin: 14px 0 0; letter-spacing: -.5px; color: #F4F1EA; }
+.sec-desc { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; color: #6A675F;
+  text-align: right; line-height: 1.7; }
+.mono-cap { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: #6A675F; }
+
+/* ── Interactive ── */
+.btn { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: #F4F1EA; background: transparent; border: 1px solid rgba(244,241,234,.18); padding: 13px 26px;
+  cursor: pointer; transition: border-color .18s, color .18s, background .18s; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { border-color: var(--accent); color: var(--accent); }
+.btn.primary:hover { background: var(--accent); color: #0B0B0C; }
+.btn:disabled { opacity: .4; cursor: default; }
+
+.chip { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; color: #8E8A82;
+  background: transparent; border: 1px solid rgba(244,241,234,.12); padding: 8px 16px; cursor: pointer;
+  transition: all .18s; }
+.chip:hover { color: #F4F1EA; border-color: rgba(244,241,234,.3); }
+.chip.active { color: var(--accent); border-color: var(--accent); }
+
+.check { width: 15px; height: 15px; flex: none; border: 1.5px solid rgba(244,241,234,.28);
+  background: transparent; cursor: pointer; transition: all .15s; }
+.task-row { cursor: pointer; }
+.task-row:hover .check { border-color: var(--accent); }
+.task-row.done .check { background: var(--accent); border-color: var(--accent); }
+.task-row.done .task-label { color: #5A5752; text-decoration: line-through; }
+
+.habit-pip { width: 26px; height: 26px; flex: none; border-radius: 50%; border: 1.5px solid rgba(244,241,234,.22);
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+.habit-pip:hover { border-color: var(--accent); }
+.habit-pip.done { background: var(--accent); border-color: var(--accent); }
+.habit-pip.done::after { content: '✓'; color: #0B0B0C; font-size: 13px; font-weight: 700; }
+
+.step-btn { width: 38px; height: 38px; flex: none; border: 1px solid rgba(244,241,234,.18); background: transparent;
+  color: #F4F1EA; font-size: 18px; cursor: pointer; line-height: 1; transition: all .15s; }
+.step-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.water-pip { width: 22px; height: 30px; flex: none; border: 1.5px solid rgba(244,241,234,.2);
+  border-radius: 0 0 6px 6px; transition: all .2s; }
+.water-pip.full { background: var(--accent); border-color: var(--accent); }
+
+.venture-row { transition: background .18s; }
+.venture-row:hover { background: rgba(244,241,234,.02); }
+
+input { font-size: 16px; } /* prevents iOS zoom-on-focus */
+
+/* ══════════ LOCK / SIGN-IN SCREEN ══════════ */
+#lock { position: fixed; inset: 0; z-index: 200; background: #0B0B0C;
+  display: none; align-items: center; justify-content: center;
+  padding: calc(var(--sat) + 20px) 24px calc(var(--sab) + 20px);
+  font-family: 'Hanken Grotesk', sans-serif; }
+#lock.show { display: flex; }
+.lock-inner { width: 340px; max-width: 100%; text-align: center; }
+.lock-brand { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 38px; letter-spacing: 5px;
+  color: #F4F1EA; text-transform: uppercase; }
+.lock-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px;
+  text-transform: uppercase; color: #6A675F; margin-top: 10px; }
+.lock-pane { margin-top: 30px; }
+#lock input { width: 100%; margin-top: 12px; padding: 16px; background: #0E0E10;
+  border: 1px solid rgba(244,241,234,.14); color: #F4F1EA; font-family: 'JetBrains Mono', monospace;
+  outline: none; border-radius: 12px; }
+#lock input:focus { border-color: var(--accent); }
+#li-go { width: 100%; margin-top: 16px; padding: 17px; border-radius: 12px; }
+.lock-msg { margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6;
+  color: #8E8A82; min-height: 18px; }
+.lock-msg.err { color: #E8705B; }
+.lock-msg.ok { color: var(--accent); }
+.li-alt { margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px;
+  color: #5A5752; cursor: pointer; }
+.li-alt:hover { color: #C9C5BC; }
+
+/* hold-to-enter */
+.holdbtn { position: relative; width: 168px; height: 168px; border: none; background: transparent;
+  cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; margin: 4px auto 0; display: block; }
+.holdbtn svg { width: 168px; height: 168px; transform: rotate(-90deg); display: block; }
+.hb-track { fill: none; stroke: rgba(244,241,234,.12); stroke-width: 2.5; }
+.hb-prog { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 339.292; stroke-dashoffset: 339.292; filter: drop-shadow(0 0 6px rgba(245,197,24,.5)); }
+.hb-core { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 8px; pointer-events: none; }
+.hb-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px rgba(245,197,24,.6);
+  transition: transform .15s; }
+.holdbtn.active .hb-dot { transform: scale(1.5); }
+.hb-label { font-family: 'JetBrains Mono', monospace; letter-spacing: 4px; font-size: 12px; color: #8E8A82;
+  text-transform: uppercase; transition: color .15s; }
+.holdbtn.active .hb-label { color: var(--accent); }
+
+/* ══════════ MOBILE NAV SHEET ══════════ */
+#navsheet { position: fixed; inset: 0; z-index: 150; background: rgba(11,11,12,.96);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: none; flex-direction: column; padding: calc(var(--sat) + 18px) 22px calc(var(--sab) + 22px); }
+#navsheet.show { display: flex; }
+.ns-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ns-brand { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 4px;
+  color: #F4F1EA; text-transform: uppercase; }
+.ns-close { background: transparent; border: none; color: #8E8A82; font-size: 26px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+.ns-list { flex: 1; overflow-y: auto; margin-top: 6px; }
+.ns-item { display: flex; align-items: baseline; gap: 16px; padding: 16px 4px; border-bottom: 1px solid var(--line);
+  cursor: pointer; }
+.ns-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5A5752; min-width: 26px; }
+.ns-name { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 28px; letter-spacing: .5px;
+  text-transform: uppercase; color: #C9C5BC; }
+.ns-item.active .ns-name { color: var(--accent); }
+.ns-item.active .ns-num { color: var(--accent); }
+.ns-signout { margin-top: 14px; align-self: flex-start; }
+
+/* ══════════ SCROLL CONTROLS ══════════ */
+#scroller { position: fixed; right: 16px; bottom: calc(var(--sab) + 18px); z-index: 60;
+  display: flex; flex-direction: column; border: 1px solid rgba(244,241,234,.12); border-radius: 999px;
+  overflow: hidden; background: rgba(14,14,16,.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4); opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; pointer-events: none; }
+#scroller.show { opacity: 1; transform: none; pointer-events: auto; }
+.sc-btn { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; cursor: pointer; color: #C9C5BC; transition: color .15s, background .15s; }
+.sc-btn:hover { color: var(--accent); background: rgba(245,197,24,.06); }
+.sc-btn:disabled { color: #3A3833; cursor: default; }
+.sc-btn svg { width: 18px; height: 18px; }
+.sc-div { height: 1px; background: rgba(244,241,234,.1); }
+
+/* ══════════════════ RESPONSIVE ══════════════════ */
+@media (max-width: 860px) {
+  #rail { display: none; }
+  #orb { display: none; }
+
+  #mbar { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: sticky; top: 0; z-index: 40; background: rgba(11,11,12,.86);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: calc(var(--sat) + 12px) 18px 12px; }
+  .mb-menu { background: transparent; border: none; color: #F4F1EA; padding: 4px; cursor: pointer; display: flex; }
+  .mb-menu svg { width: 24px; height: 24px; }
+  #mb-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent); }
+  .mb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px rgba(245,197,24,.5); }
+
+  .section { padding: 26px 18px 130px 18px !important; }
+  .sec-desc { display: none !important; }
+  .sec-title { font-size: 40px !important; }
+  .sec-header { padding-bottom: 18px; }
+
+  /* TODAY */
+  #today-greeting { font-size: 52px !important; line-height: .92 !important; }
+  .today-hero { margin-top: 34px !important; }
+  .today-ns { margin-top: 34px !important; }
+  .today-ns p, .today-ns input { font-size: 17px !important; }
+  .today-grid { grid-template-columns: 1fr !important; padding-top: 30px !important; }
+  .today-grid > div { border-right: none !important; border-bottom: 1px solid var(--line) !important;
+    padding: 22px 0 !important; }
+
+  /* shared grids */
+  .grid-3 { grid-template-columns: 1fr 1fr !important; gap: 14px 22px !important; }
+  .grid-3 > div { padding: 6px 0 !important; }
+  .grid-2 { grid-template-columns: 1fr !important; gap: 30px !important; }
+
+  /* big stat numbers */
+  .statval { font-size: 36px !important; }
+}
+
+@media (max-width: 420px) {
+  .sec-title { font-size: 34px !important; }
+  #today-greeting { font-size: 44px !important; }
+  .ns-name { font-size: 24px !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="orb"><div id="orb-inner"><div id="orb-dot"></div></div><div id="orb-ring"></div></div>
+
+  <!-- Rail (desktop) -->
+  <nav id="rail">
+    <div id="rail-title">Threshold</div>
+    <div id="rail-divider"></div>
+    <div id="rail-nav"></div>
+    <button id="signout-rail" title="Sign out">⎋</button>
+    <div id="rail-pip"></div>
+  </nav>
+
+  <main id="main">
+
+    <!-- Mobile top bar -->
+    <header id="mbar">
+      <button class="mb-menu" id="mb-menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div id="mb-title">TODAY</div>
+      <div class="mb-dot"></div>
+    </header>
+
+    <!-- ============ 01 TODAY ============ -->
+    <section class="section active" id="sec-TODAY" style="padding:56px 72px 64px 64px;display:flex;flex-direction:column;">
+      <div id="today-date" class="mono-cap" style="font-size:12px;letter-spacing:2.5px;"></div>
+
+      <div class="today-hero" style="margin-top:108px">
+        <h1 id="today-greeting" style="font-family:'Oswald',sans-serif;font-weight:700;font-size:104px;line-height:.9;letter-spacing:-1.5px;text-transform:uppercase;margin:0;color:#F4F1EA"></h1>
+      </div>
+
+      <div class="today-ns" style="margin-top:80px;max-width:620px">
+        <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Today's North Star</div>
+        <input id="today-ns-text" placeholder="What matters today…" spellcheck="false"
+          style="font-size:21px;line-height:1.5;color:#C9C5BC;margin:18px 0 0;font-weight:400;background:transparent;border:none;outline:none;width:100%">
+        <div style="margin-top:24px;width:100%;height:1px;background:rgba(244,241,234,.1)"></div>
+      </div>
+
+      <div class="today-pri" style="margin-top:34px;max-width:620px">
+        <div class="mono-cap" style="font-size:11px;letter-spacing:3px;">Top Three</div>
+        <div id="today-priorities" style="margin-top:16px;display:flex;flex-direction:column;gap:11px"></div>
+      </div>
+
+      <div class="today-grid" style="margin-top:auto;padding-top:64px;display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:0;border-top:1px solid rgba(244,241,234,.09)">
+        <div style="padding:26px 36px 4px 0;border-right:1px solid var(--line)">
+          <div class="mono-cap" style="font-size:11px;">Blocks</div>
+          <div id="today-blocks" style="margin-top:18px;display:flex;flex-direction:column;gap:13px"></div>
+        </div>
+        <div style="padding:26px 36px 4px;border-right:1px solid var(--line)">
+          <div class="mono-cap" style="font-size:11px;">Open Loops</div>
+          <div id="today-loops" style="margin-top:18px;display:flex;flex-direction:column;gap:13px"></div>
+          <div class="mono-cap" style="margin-top:22px;font-size:11px;">Due Soon</div>
+          <div id="today-due" style="margin-top:14px;display:flex;flex-direction:column;gap:11px"></div>
+        </div>
+        <div style="padding:26px 0 4px 36px">
+          <div class="mono-cap" style="font-size:11px;">Pulse</div>
+          <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Done</div><div id="pulse-done" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0</div></div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(244,241,234,.06);padding-bottom:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8E8A82">Top streak</div><div id="pulse-streak" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:26px;color:#F4F1EA">0d</div></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ 02 WORK ============ -->
+    <section class="section" id="sec-WORK" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">02 · Work</div><h2 class="sec-title">Work</h2></div>
+        <div class="sec-desc">What I'm building<br>and what's gone quiet.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="venture-input" placeholder="Add a project or venture…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="venture-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:8px" id="projects-list"></div>
+    </section>
+
+    <!-- ============ 03 TASKS ============ -->
+    <section class="section" id="sec-TASKS" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">03 · Tasks</div><h2 class="sec-title">Tasks</h2></div>
+        <div class="sec-desc">Open loops.<br>Close them.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="task-input" placeholder="Add a task…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <select id="task-venture" style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+          <option value="">Personal</option>
+        </select>
+        <button id="task-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="tasks-list"></div>
+      <div id="tasks-summary" class="mono-cap" style="margin-top:24px;font-size:11px;"></div>
+    </section>
+
+    <!-- ============ 04 PERSONAL ============ -->
+    <section class="section" id="sec-PERSONAL" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">04 · Personal</div><h2 class="sec-title">Personal</h2></div>
+        <div class="sec-desc">What holds steady<br>when everything moves.</div>
+      </div>
+      <div style="margin-top:30px;max-width:680px" id="habits-list"></div>
+
+      <!-- Health (folded in from the former HEALTH section) -->
+      <div class="sec-header">
+        <div><h2 class="sec-title">Health</h2></div>
+        <div class="sec-desc">The body runs<br>the whole thing.</div>
+      </div>
+      <div class="grid-2" style="margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:56px;max-width:900px">
+        <div>
+          <div class="mono-cap" style="font-size:11px;">Water · goal 8 glasses</div>
+          <div style="margin-top:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <button class="step-btn" id="water-minus">−</button>
+            <div style="display:flex;gap:7px" id="water-pips"></div>
+            <button class="step-btn" id="water-plus">+</button>
+          </div>
+          <div id="water-count" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:var(--accent);margin-top:22px">0 / 8</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:32px">
+          <div>
+            <div class="mono-cap" style="font-size:11px;">Workout today</div>
+            <div style="margin-top:18px;display:flex;align-items:center;gap:16px">
+              <div class="habit-pip" id="workout-pip"></div>
+              <div id="workout-label" style="font-size:17px;color:#C9C5BC">Not done yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-header">
+        <div><h2 class="sec-title">Reminders</h2></div>
+        <div class="sec-desc">Dates that matter.<br>Before they arrive.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="reminder-input" placeholder="What to remember…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="reminder-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="reminder-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="reminders-list"></div>
+
+      <div class="sec-header">
+        <div><h2 class="sec-title">Family</h2></div>
+        <div class="sec-desc">The people, not the tasks.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;gap:10px">
+        <input id="family-input" placeholder="A note about someone…" spellcheck="false"
+          style="flex:1;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="family-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="family-list"></div>
+    </section>
+
+    <!-- ============ 05 FINANCE ============ -->
+    <section class="section" id="sec-FINANCE" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">05 · Finance</div><h2 class="sec-title">Finance</h2></div>
+        <div class="sec-desc">Runway, not score.</div>
+      </div>
+      <!-- capture -->
+      <div style="margin-top:26px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;gap:8px">
+          <button class="chip active" id="txn-kind-expense" data-kind="expense">SPENT</button>
+          <button class="chip" id="txn-kind-income" data-kind="income">EARNED</button>
+        </div>
+        <input id="txn-amount" placeholder="₹ amount" inputmode="decimal"
+          style="width:140px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <select id="txn-category"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px"></select>
+        <input id="txn-note" placeholder="note (optional)" spellcheck="false"
+          style="flex:1;min-width:160px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="txn-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="txn-add" class="btn primary">Add</button>
+      </div>
+
+      <!-- this month -->
+      <div class="grid-3" style="margin-top:46px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:900px">
+        <div><div class="mono-cap" style="font-size:10px;">In this month</div><div id="fin-income" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:var(--accent);margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Out this month</div><div id="fin-expense" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Net</div><div id="fin-net" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">₹ 0</div></div>
+        <div><div class="mono-cap" style="font-size:10px;">Runway</div><div id="fin-runway" class="statval" style="font-family:'Oswald',sans-serif;font-weight:600;font-size:40px;color:#F4F1EA;margin-top:6px">—</div></div>
+      </div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">What This Says</div>
+      <div id="fin-insights" style="margin-top:14px;max-width:760px;display:flex;flex-direction:column;gap:11px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Where It Goes</div>
+      <div id="fin-categories" style="margin-top:16px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Last Six Months</div>
+      <div id="fin-trend" style="margin-top:16px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Recent</div>
+      <div id="fin-recent" style="margin-top:10px;max-width:760px"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Due &amp; Renewals</div>
+      <div style="margin-top:16px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap">
+        <input id="bill-name" placeholder="What's due…" spellcheck="false"
+          style="flex:1;min-width:200px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="bill-amount" placeholder="₹" inputmode="decimal"
+          style="width:120px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="bill-date" type="date"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#C9C5BC;font-family:'JetBrains Mono',monospace;padding:14px 12px;outline:none;border-radius:10px">
+        <button id="bill-add" class="btn">Add</button>
+      </div>
+      <div style="margin-top:10px" id="finance-list"></div>
+
+      <div class="mono-cap" style="margin-top:46px;font-size:11px;">Settings</div>
+      <div style="margin-top:16px;max-width:900px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="fin-cash" placeholder="Cash on hand ₹" inputmode="decimal"
+          style="width:200px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="fin-tax" placeholder="Tax set-aside %" inputmode="decimal"
+          style="width:180px;background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <button id="fin-save-settings" class="btn">Save</button>
+      </div>
+    </section>
+
+    <!-- ============ 06 JOURNAL ============ -->
+    <section class="section" id="sec-JOURNAL" style="padding:54px 72px 80px 64px">
+      <div class="sec-header">
+        <div><div class="sec-label">06 · Journal</div><h2 class="sec-title">Journal</h2></div>
+        <div class="sec-desc">A line a day,<br>most days.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;flex-direction:column;gap:10px">
+        <textarea id="journal-input" placeholder="What happened today…" spellcheck="false" rows="3"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px;resize:vertical"></textarea>
+        <div style="display:flex;gap:10px">
+          <button id="journal-add" class="btn">Add entry</button>
+        </div>
+      </div>
+      <div style="margin-top:18px;max-width:760px" id="journal-list"></div>
+
+      <div class="sec-header">
+        <div><h2 class="sec-title">Reflection</h2></div>
+        <div class="sec-desc">One line on today.<br>One star for tomorrow.</div>
+      </div>
+      <div style="margin-top:26px;max-width:760px;display:flex;flex-direction:column;gap:10px">
+        <input id="refl-one-line" placeholder="One line on today…" spellcheck="false"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+        <input id="refl-tomorrow" placeholder="Tomorrow's north star…" spellcheck="false"
+          style="background:#0E0E10;border:1px solid rgba(244,241,234,.14);color:#F4F1EA;font-family:'JetBrains Mono',monospace;padding:14px 16px;outline:none;border-radius:10px">
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Scroll controls -->
+<div id="scroller">
+  <button class="sc-btn" id="sc-up" aria-label="Scroll up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+  <div class="sc-div"></div>
+  <button class="sc-btn" id="sc-down" aria-label="Scroll down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+
+<!-- Mobile nav sheet -->
+<div id="navsheet">
+  <div class="ns-head"><div class="ns-brand">Threshold</div><button class="ns-close" id="ns-close" aria-label="Close">✕</button></div>
+  <div class="ns-list" id="ns-list"></div>
+  <button class="btn ns-signout" id="ns-signout">Sign out</button>
+</div>
+
+<!-- Lock / sign-in -->
+<div id="lock">
+  <div class="lock-inner">
+    <div class="lock-brand">Threshold</div>
+    <!-- sign-in -->
+    <div class="lock-pane" id="lock-signin" style="display:none">
+      <div class="lock-sub" id="li-sub">Set a password to begin</div>
+      <input id="li-email" type="email" placeholder="email" autocomplete="email">
+      <input id="li-pass" type="password" placeholder="password" autocomplete="current-password">
+      <button id="li-go" class="btn primary">Enter</button>
+      <div id="li-msg" class="lock-msg"></div>
+    </div>
+    <!-- hold to enter -->
+    <div class="lock-pane" id="lock-hold" style="display:none">
+      <button class="holdbtn" id="holdbtn" aria-label="Hold to enter">
+        <svg viewBox="0 0 120 120"><circle class="hb-track" cx="60" cy="60" r="54"/><circle class="hb-prog" id="hb-prog" cx="60" cy="60" r="54"/></svg>
+        <span class="hb-core"><span class="hb-dot"></span><span class="hb-label" id="hb-label">Hold</span></span>
+      </button>
+      <div class="lock-sub" id="hold-sub" style="margin-top:22px">Press &amp; hold to enter</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="app/main.js"></script>
+</body>
+</html>
