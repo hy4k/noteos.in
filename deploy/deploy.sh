@@ -30,7 +30,7 @@ RSYNC_SSH="ssh -p $VPS_PORT -o StrictHostKeyChecking=accept-new"
 if [[ -n "${VPS_SSH_KEY:-}" ]]; then
   KEY="${VPS_SSH_KEY/#\~/$HOME}"
   SSH_OPTS+=(-i "$KEY")
-  RSYNC_SSH="$RSYNC_SSH -i $KEY"
+  RSYNC_SSH="$RSYNC_SSH -i '$KEY'"
 fi
 TARGET="${VPS_USER}@${VPS_HOST}"
 
